@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#2A3547; --muted:#5A6A85; --line:#DFE5EF; --line2:#EEF2F7; --bg:#F0F5F9; --surface:#FFFFFF; --head:#F7F9FC;
-  --pri:#2F5BD3; --pri-soft:#ECF2FF; --navy:#3E4A5C;
+  --ink:#2A3547; --muted:#5A6A85; --line:#DFE5EF; --line2:#EEF2F7; --bg:#F4F8FA; --surface:#FFFFFF; --head:#F7F9FC;
+  --pri:#1E6B85; --pri-soft:#E7F2F6; --navy:#3E4A5C;
   --ok:#1E7A5B; --ok-dot:#2CA87F; --ok-soft:#E6F6EF; --ok-line:#A9DCC7;
   --err:#B3412A; --err-soft:#FEEDE8; --err-line:#F4C2B4;
   --warn:#7A4E00; --warn-dot:#FFAE1F; --warn-soft:#FFF4DE; --warn-line:#F5D99A;
@@ -100,6 +100,40 @@ button{cursor:pointer}
 .it .c-of{display:none}
 .it.head{background:var(--head);font-size:12px;color:var(--muted)}
 .it.flash{background:#F2FBF7}
+.it.bad{background:#FDF6F4}
+.it-grp{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;font-weight:500;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--line2);letter-spacing:.02em}
+.it-grp span{font-weight:400;background:#fff;border:1px solid var(--line);border-radius:999px;padding:0 8px}
+.it-grp.g-prog{color:var(--pri)}.it-grp.g-err{color:var(--err)}.it-grp.g-done{color:var(--ok)}
+.tab.t-err .cnt{background:var(--err-soft);color:var(--err)}
+.tabs.in{gap:0}@container (min-width: 561px){.tabs.in{flex-wrap:wrap;overflow:visible}}.tabs.in .tab{padding:0 8px;gap:6px;font-size:13px}
+.it .d3{font-size:12px;color:var(--err);font-weight:500}
+.palrow2{display:flex;flex-direction:column;gap:8px;margin:12px 0 10px;padding-top:12px;border-top:1px solid var(--line2)}
+.pals,.pvbar{display:flex;flex-wrap:wrap;gap:6px}
+.pvbar{padding:10px 14px;border-bottom:1px solid var(--line2)}
+.pal{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:48px;height:48px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;cursor:pointer;line-height:1.1}
+.pal b{font-size:15px;font-weight:500}.pal small{font-size:11px;color:var(--muted)}
+.pal[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:#fff}.pal[aria-pressed="true"] small{color:#D6EAF1}
+.pal.add{border-style:dashed;color:var(--pri);font-size:16px}
+.pal.sm{flex-direction:row;height:34px;min-width:0;font-size:13px}
+.iqrow{position:relative;display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line2)}
+.iqico{position:absolute;left:26px;top:50%;transform:translateY(-50%);color:var(--muted);display:flex}
+.inp.iq{height:40px;padding-left:36px;font-size:14px;flex:1;min-width:0}
+.iqx{height:40px;width:40px;padding:0;font-size:20px;line-height:1}
+.inp.iq::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.iqinfo{padding:8px 14px;font-size:12px;color:var(--muted);background:var(--pri-soft);border-bottom:1px solid var(--line2)}
+.sepok{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--warn-line,#E9C98B);background:var(--warn-soft);border-radius:10px;cursor:pointer}
+.sepok input{width:22px;height:22px;margin:1px 0 0;flex:none;accent-color:var(--ok)}
+.sepok b{display:block;font-weight:500;font-size:14px;color:var(--ink)}
+.sepok small{display:block;font-size:12px;color:var(--warn);margin-top:2px;line-height:1.4}
+.sepok.on{background:var(--ok-soft);border-color:#A8D8C4}.sepok.on small{color:var(--ok)}
+.sepok.need{outline:2px solid var(--err);outline-offset:2px}
+.kbtn{border:1px solid transparent;background:none;text-align:left;border-radius:8px;cursor:pointer;color:inherit;font:inherit;margin:-6px;padding:6px!important}
+.kbtn:hover{background:var(--pri-soft)}
+.kbtn[aria-pressed="true"]{background:var(--pri-soft);border-color:var(--pri)}
+.kbtn .l span{color:var(--pri)}
+.lg{display:grid;grid-template-columns:76px minmax(160px,1fr) 108px 150px 56px;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line2);font-size:13px}
+.lg.head{background:var(--head);font-size:12px;color:var(--muted)}
+.lg .d1{font-size:13px;font-weight:500}.lg .d2{font-size:12px;color:var(--muted)}
 .it .d1{font-size:13px;font-weight:500}.it .d2{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .camwrap{position:relative;background:#1C2433;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3}
 .camwrap video{width:100%;height:100%;object-fit:cover;display:block}
@@ -146,6 +180,9 @@ textarea.out{width:100%;min-height:140px;border:1px solid var(--line);border-rad
   .srow .c-no{display:none}
 }
 @container (max-width: 560px){
+  .lg{grid-template-columns:62px minmax(0,1fr) auto;gap:2px 10px}
+  .lg.head{display:none}
+  .lg .c-batch,.lg .c-pal{display:none}
   .it{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
   .it.head{display:none}
   .it .c-tgt{display:none}
@@ -174,6 +211,102 @@ textarea.out{width:100%;min-height:140px;border:1px solid var(--line);border-rad
   .top{padding:8px 12px}
   .wrap{padding:12px}
 }
+
+/* ===== v2: shell ERP (sidebar, topbar, kartu, panel kanan) ===== */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:14px;position:sticky;top:0;height:100vh;box-sizing:border-box}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 6px}
+.brand .b1{font-weight:500;font-size:15px}.brand .b2{font-size:11px;color:var(--muted)}
+.logo.sm{width:32px;height:32px}
+.whbox{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;background:var(--bg)}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav-h{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px}
+.nav-i{display:flex;align-items:center;gap:10px;height:42px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:var(--ink);font-size:14px;text-align:left;width:100%}
+.nav-i.active{background:var(--pri);color:#fff;font-weight:500}
+.nav-i .cnt{margin-left:auto;font-size:12px;background:rgba(255,255,255,.22);padding:2px 8px;border-radius:999px}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line2);padding-top:12px}
+.who{display:flex;gap:10px;align-items:center;min-width:0}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:10px 24px;min-height:62px;box-sizing:border-box}
+.tb-brand,.tb-user{display:none}
+.tb-left{flex:1;min-width:0}
+.tsearch{display:flex;align-items:center;gap:8px;height:42px;padding:0 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;max-width:560px}
+.tsearch input{flex:1;border:0;outline:0;background:transparent;font-size:14px;height:100%;min-width:0}
+.tsearch:focus-within{border-color:var(--pri);background:#fff}
+.sync{font-size:12px;white-space:nowrap}
+.page{padding:18px 24px 32px;max-width:1440px;width:100%;box-sizing:border-box}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.crumb b{color:var(--ink);font-weight:500}
+.crumb.tb{margin:0}
+.link{border:0;background:none;padding:0;color:var(--pri);font-size:13px;cursor:pointer}
+.link:hover{text-decoration:underline}
+.doc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.doc-head h1{margin:0;font-size:22px;font-weight:500}
+.doc-act{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap}
+.chip-g{background:var(--ok-soft);color:var(--ok)}.chip-w{background:var(--warn-soft);color:var(--warn)}.chip-b{background:var(--pri-soft);color:var(--pri)}.chip-r{background:var(--err-soft);color:var(--err)}.chip-n{background:#EEF2F7;color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:12px;overflow-x:auto}
+.tab{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:0;background:none;border-bottom:2px solid transparent;color:var(--muted);font-size:14px;white-space:nowrap;margin-bottom:-1px}
+.tab[aria-pressed="true"]{color:var(--pri);border-bottom-color:var(--pri);font-weight:500}
+.tab .cnt{font-size:12px;background:#EEF2F7;color:var(--muted);padding:1px 8px;border-radius:999px}
+.tab[aria-pressed="true"] .cnt{background:var(--pri-soft);color:var(--pri)}
+.tabs.in{padding:0 8px;margin:0}
+.cards{display:flex;flex-direction:column;gap:10px}
+.plwrap{display:flex;flex-direction:column}
+.plcard{width:100%;display:grid;grid-template-columns:minmax(230px,1.1fr) minmax(0,1.6fr) 64px 76px 86px 24px;gap:16px;align-items:center;padding:14px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;text-align:left;color:var(--ink)}
+.plcard:hover{border-color:var(--pri);box-shadow:0 2px 10px rgba(30,107,133,.08)}
+.pl-top{display:flex;align-items:center;gap:10px}
+.plno{font-size:15px;font-weight:500}
+.meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
+.meta span{display:inline-flex;gap:4px;align-items:center}
+.who-l{color:var(--pri)!important;font-weight:500}
+.col{display:flex;flex-direction:column;gap:2px;min-width:0}
+.col .lab{font-size:11px;color:var(--muted)}
+.col .val{font-size:14px;font-weight:500}
+.col .sub{font-size:12px;color:var(--muted)}
+.col.r{align-items:flex-end}
+.c-go{color:var(--muted);display:flex;justify-content:flex-end}
+.plwrap .unlock{position:static;transform:none;align-self:flex-end;margin-top:6px;height:34px;font-size:12px}
+.monly{display:none!important}
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:auto 1fr;grid-template-areas:"scan aside" "items aside";gap:16px;align-items:start}
+.d-scan{grid-area:scan;min-width:0}.d-aside{grid-area:aside;display:flex;flex-direction:column;gap:12px}.d-items{grid-area:items;min-width:0}
+.scanrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.card.pad{padding:14px 16px}
+.ctitle{font-size:14px;font-weight:500;margin-bottom:10px}
+.d-aside .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+.d-aside .kpi{padding:0}
+.palrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0 10px;padding-top:12px;border-top:1px solid var(--line2)}
+.steps{display:flex;justify-content:space-between;position:relative;padding-top:2px}
+.steps:before{content:'';position:absolute;left:16%;right:16%;top:11px;height:2px;background:var(--line)}
+.st{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted);flex:1;text-align:center}
+.st i{width:18px;height:18px;border-radius:999px;border:2px solid var(--line);background:#fff;z-index:1;box-sizing:border-box}
+.st.done i{background:var(--pri);border-color:var(--pri)}
+.st.cur i{border-color:var(--pri);box-shadow:0 0 0 4px var(--pri-soft)}
+.st.cur span,.st.done span{color:var(--ink);font-weight:500}
+.st.bad i{background:var(--err);border-color:var(--err);box-shadow:0 0 0 4px var(--err-soft)}
+@media (max-width: 900px){
+  .shell{grid-template-columns:1fr}
+  .side{display:none}
+  .tb-brand,.tb-user{display:flex;align-items:center;gap:8px}
+  .tb-user{margin-left:auto}
+  .tb-out{width:44px;padding:0}
+  .topbar{padding:8px 12px}
+  .page{padding:12px}
+  .dgrid{grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:"scan" "aside" "items"}
+  .scanrow{grid-template-columns:1fr}
+  .mhide{display:none!important}
+  .plcard{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"pl go" "cust cust";gap:8px 12px;padding:14px}
+  .plcard .c-pl{grid-area:pl}.plcard .c-cust{grid-area:cust}.plcard .c-go{grid-area:go}
+  .plcard .c-lines,.plcard .c-full,.plcard .c-loose{display:none}
+  .monly{display:flex!important}
+  .doc-act .btn.pri{display:none}
+  .topbar{flex-wrap:wrap}
+  .tb-left:has(.has-search){order:5;flex-basis:100%}
+  .tsearch{max-width:none}
+  .doc-act{width:100%}.doc-act .seg{flex:1 1 0}.doc-act .seg button{flex:1;padding:0 6px}.doc-act .btn.pri{width:100%}
+  .doc-head h1{font-size:19px}
+  .crumb.tb{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -193,7 +326,7 @@ var FIREBASE_CONFIG = {
 var FB_VER = '13.1.0';
 var CFG = {
   emailDomain: 'picking-checker.firebaseapp.com', // harus sama dengan PCHK_CFG.EMAIL_DOMAIN di GAS
-  dupMsScanner: 1500,
+  dupMsScanner: 0,          // 0 = tanpa jeda; scan barcode sama berturut-turut dihitung semua
   dupMsCamera: 2500,
   flushMs: 4000,          // kirim log scan tiap 4 detik
   flushMax: 15,           // atau tiap 15 event
@@ -338,14 +471,14 @@ function parseBarcode(raw){
 
 /* ================= State ================= */
 var DB=null;
-var APP={view:'boot',me:null,authMsg:'',pls:[],plsErr:'',pl:null,filter:'todo',q:'',mode:'ctn',input:'scanner',itemFilter:'open',
+var APP={view:'boot',me:null,authMsg:'',pls:[],plsErr:'',pl:null,filter:'todo',q:'',mode:'ctn',input:'scanner',itemFilter:'all',palView:'all',iq:'',iqFocus:false,
   fb:null,blocked:null,lastRaw:'',lastT:0,lastLine:null,modal:null,cam:null,typing:false,
   pending:[],flushT:null,hbT:null,unsubPl:null,unsubList:null,plHash:null,plChanged:false,busy:false,syncState:'ok'};
 var SESS={};
 
 function plById(id){for(var i=0;i<APP.pls.length;i++)if(APP.pls[i].pl===id)return APP.pls[i];return null;}
 function sess(id){
-  if(!SESS[id]) SESS[id]={events:[],reasons:lsGet('pchk_rs_'+id)||{},palet:1,startedAt:null,finishedAt:null,checker:null,submitted:false};
+  if(!SESS[id]) SESS[id]={events:[],reasons:lsGet('pchk_rs_'+id)||{},palet:1,palCount:1,startedAt:null,finishedAt:null,checker:null,submitted:false};
   return SESS[id];
 }
 function lineKey(l){return String(l.no);}
@@ -392,7 +525,7 @@ function flush(){
   });
 }
 function paintSync(){
-  var el=$('#syncState'); if(!el) return;
+  var el=$('#syncState'); if(!el) return; if(!APP.pl){el.textContent='';return;}
   var m={ok:['Tersinkron','var(--ok)'],sending:['Mengirim…','var(--muted)'],offline:['Offline: tersimpan di perangkat','var(--warn)'],error:['Gagal sinkron','var(--err)']}[APP.syncState]||['',''];
   el.textContent=m[0]; el.style.color=m[1];
 }
@@ -425,19 +558,19 @@ function handleScan(raw,source){
   if(APP.blocked){ if(source==='camera') return; beep('err'); toast('Selesaikan peringatan dulu: tekan tombol di kotak merah/kuning.'); return; }
 
   var b=parseBarcode(str);
-  if(!b||!b.ok){ logEv(s,{raw:str,res:'FORMAT'}); block({cls:'err',title:'Barcode tidak dikenali',lines:[(b&&b.why)||'Format tidak sesuai','Isi: '+str.slice(0,80)],ack:'Mengerti'}); return; }
+  if(!b||!b.ok){ logEv(s,{raw:str,res:'FORMAT'}); flag({cls:'err',title:'Barcode tidak dikenali',lines:[(b&&b.why)||'Format tidak sesuai','Isi: '+str.slice(0,80),'Pisahkan karton ini. Scan berikutnya bisa langsung dilanjutkan.']}); return; }
 
   var byCode=pl.lines.filter(function(l){return l.code===b.code;});
   if(!byCode.length){
     var others=APP.pls.filter(function(p){return p.pl!==pl.pl&&p.lines.some(function(l){return l.code===b.code;});}).map(function(p){return p.pl;});
     logEv(s,{raw:str,code:b.code,batch:b.batch,res:'NOTIN'});
-    block({cls:'err',title:'Item tidak ada di PL ini',lines:[b.code+' · '+b.batch,others.length?('Item ini ada di PL '+others.join(', ')):'ItemCode tidak ada di PL '+pl.pl,'Kembalikan karton ke picker.'],ack:'Karton sudah dipisahkan'});
+    flag({cls:'err',title:'Item tidak ada di PL ini',lines:[b.code+' · '+b.batch,others.length?('Item ini ada di PL '+others.join(', ')):'ItemCode tidak ada di PL '+pl.pl,'Kembalikan karton ke picker.','Pisahkan karton ini. Scan berikutnya bisa langsung dilanjutkan.']});
     return;
   }
   var cand=byCode.filter(function(l){return String(l.batch).toUpperCase()===b.batch;});
   if(!cand.length){
-    logEv(s,{raw:str,code:b.code,batch:b.batch,res:'BATCH'});
-    block({cls:'err',title:'Batch tidak sesuai',lines:[b.code+' · batch discan '+b.batch,'PL meminta batch: '+byCode.map(function(l){return l.batch;}).join(' / '),byCode[0].desc],ack:'Karton sudah dipisahkan'});
+    logEv(s,{raw:str,code:b.code,batch:b.batch,res:'BATCH',line:lineKey(byCode[0])});
+    flag({cls:'err',title:'Batch tidak sesuai',lines:[b.code+' · batch discan '+b.batch,'PL meminta batch: '+byCode.map(function(l){return l.batch;}).join(' / '),byCode[0].desc,'Pisahkan karton ini. Scan berikutnya bisa langsung dilanjutkan.']});
     return;
   }
   var d=lineDone(pl), line=null;
@@ -451,7 +584,7 @@ function handleScan(raw,source){
 
   if(remain<=0){
     logEv(s,{raw:str,code:b.code,batch:b.batch,res:'OVER',line:k});
-    block({cls:'warn',title:'Melebihi target',lines:['Baris '+line.no+' · '+line.desc,'Target '+fmtQ(line.qty,line.pk)+' sudah terpenuhi.','Keluarkan karton ini, jangan ikut dikirim.'],ack:'Karton sudah dikeluarkan'});
+    flag({cls:'err',title:'Melebihi target',lines:['Baris '+line.no+' · '+line.desc,'Target '+fmtQ(line.qty,line.pk)+' sudah terpenuhi.','Keluarkan karton ini, jangan ikut dikirim. Scan berikutnya bisa langsung dilanjutkan.']});
     return;
   }
   if(per>remain){
@@ -468,13 +601,15 @@ function handleScan(raw,source){
   beep('ok'); render();
 }
 function logEv(s,e){
-  e.id=evId(); e.t=now(); e.palet=s.palet; e.src=APP.input; e.res=e.res||'OK'; e.pcs=e.pcs||0;
+  e.id=evId(); e.t=now(); e.by=(APP.me&&APP.me.id)||''; e.palet=s.palet; e.src=APP.input; e.res=e.res||'OK'; e.pcs=e.pcs||0;
   if(e.raw) e.raw=String(e.raw).slice(0,160);
   Object.keys(e).forEach(function(k){ if(e[k]===undefined) delete e[k]; });
   if(!s.startedAt) s.startedAt=e.t;
   s.events.push(e); queueEv(e);
 }
 function setFb(f){APP.fb=f;}
+/** Tidak memblokir: tampilkan peringatan + bunyi, scan tetap bisa lanjut. */
+function flag(f){APP.fb=f;beep(f.cls==='err'?'err':'warn');render();}
 function block(f){APP.blocked=true;f.blocking=true;APP.fb=f;beep(f.cls==='err'?'err':'warn');render();}
 function ack(){APP.blocked=null;APP.fb=null;render();focusScan();}
 function undo(){
@@ -570,6 +705,43 @@ function vLogin(){
   '</form></div>';
 }
 
+/* ===== Tampilan v2: shell (sidebar + topbar), kartu PL, detail dengan panel kanan ===== */
+var IC2={
+  list:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>',
+  cal:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+  user:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  chev:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+  out:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>'
+};
+var ST_CHIP={todo:['chip-w','Belum dicek'],busy:['chip-b','Sedang dicek'],diff:['chip-r','Ada selisih'],done:['chip-g','Selesai']};
+function stChip(st){var c=ST_CHIP[st]||ST_CHIP.todo;return '<span class="chip '+c[0]+'">'+c[1]+'</span>';}
+function avatar(id){return '<span class="avatar">'+esc(String(id||'?').slice(0,2).toUpperCase())+'</span>';}
+
+function shell(top,content){
+  var u=APP.me||{}, wh=(APP.pls[0]&&APP.pls[0].wh)||'-';
+  return '<div class="shell"><aside class="side" aria-label="Menu">'+
+    '<div class="brand"><div class="logo">'+ICON.idle.replace('#5A6A85','#fff')+'</div><div style="min-width:0"><div class="b1">Picking Checker</div><div class="b2">PT Eka Jaya Internasional</div></div></div>'+
+    '<div class="whbox"><span class="muted" style="font-size:12px">Gudang</span><span style="font-weight:500">'+esc(wh)+'</span></div>'+
+    '<nav class="nav"><div class="nav-h">Operasional</div>'+
+      '<button type="button" class="nav-i active" id="navPL">'+IC2.list+'<span>Picking List</span><span class="cnt">'+APP.pls.length+'</span></button>'+
+    '</nav>'+
+    '<div class="side-foot"><div class="who">'+avatar(u.id)+'<div style="min-width:0"><div class="ell" style="font-weight:500">'+esc(u.name||u.id||'')+'</div><div class="muted" style="font-size:12px">'+esc(u.id||'')+(u.role==='admin'?' · admin':'')+'</div></div></div>'+
+      '<button type="button" class="btn" id="bOut" style="height:40px">'+IC2.out+'Keluar</button></div>'+
+  '</aside><div class="main">'+top+'<div class="page">'+content+'</div></div></div>';
+}
+function topbar(left){
+  var u=APP.me||{};
+  return '<header class="topbar"><div class="tb-brand"><div class="logo sm">'+ICON.idle.replace('#5A6A85','#fff')+'</div></div>'+
+    '<div class="tb-left">'+left+'</div><span id="syncState" class="sync"></span>'+
+    '<div class="tb-user">'+avatar(u.id)+'<button type="button" class="btn tb-out" id="bOutM" aria-label="Keluar">'+IC2.out+'</button></div></header>';
+}
+function steps(st){
+  var idx=st==='todo'?0:st==='busy'?1:2, names=['Belum dicek','Sedang dicek',st==='diff'?'Ada selisih':'Selesai'];
+  var h='<div class="steps">';
+  names.forEach(function(n,i){h+='<div class="st'+(i<idx?' done':i===idx?' cur':'')+(i===2&&st==='diff'?' bad':'')+'"><i></i><span>'+n+'</span></div>';});
+  return h+'</div>';
+}
+
 function vList(){
   var counts={todo:0,busy:0,diff:0,done:0};
   APP.pls.forEach(function(p){counts[plStatus(p)]++;});
@@ -578,36 +750,211 @@ function vList(){
     var st=plStatus(p); if(APP.filter!=='all'&&st!==APP.filter) return false;
     if(!q) return true; return (p.pl+' '+(p.ors||[]).join(' ')+' '+p.cust+' '+p.rem).toLowerCase().indexOf(q)>=0;
   });
-  var names={todo:'Belum dicek',busy:'Sedang dicek',diff:'Ada selisih',done:'Selesai'};
-  var h='<header class="top"><div class="logo">'+ICON.idle.replace('#5A6A85','#fff')+'</div><div class="grow"><h1>Picking Checker</h1><div class="sub">'+APP.pls.length+' picking list aktif</div></div>'+userChip()+'<button class="btn btn-out" id="bOut" type="button">Keluar</button></header>';
-  h+='<div class="wrap"><div class="list-head"><div><h2>Pilih Picking List</h2><div class="muted" style="margin-top:4px">Scan atau ketik No. PL, lalu Enter</div></div>'+
-    '<div style="display:flex;align-items:center;gap:8px;min-width:260px;flex:0 1 420px;height:48px;padding:0 14px;background:#fff;border:2px solid var(--pri);border-radius:10px">'+ICON.search+
-    '<label class="sr" for="q">Cari picking list</label><input id="q" value="'+esc(APP.q)+'" placeholder="No. PL, OR, atau customer" style="flex:1;border:0;outline:0;height:100%;background:transparent;font-size:15px"></div></div>';
+  var top=topbar('<div class="tsearch has-search">'+ICON.search+'<label class="sr" for="q">Cari picking list</label><input id="q" value="'+esc(APP.q)+'" placeholder="Scan / ketik No. PL, OR, atau customer lalu Enter"></div>');
+  var h='<div class="crumb">Operasional <span>/</span> <b>Picking List</b></div>';
+  h+='<div class="doc-head"><div><h1>Picking List</h1><div class="muted">'+APP.pls.length+' picking list aktif · sinkron dari SAP</div></div></div>';
   if(APP.plsErr) h+='<div class="note" style="background:var(--err-soft);color:var(--err);margin-bottom:12px">'+esc(APP.plsErr)+'</div>';
-  h+='<nav class="filters" aria-label="Filter status">';
-  ['todo','busy','diff','done','all'].forEach(function(k){h+='<button type="button" class="pill" data-f="'+k+'" aria-pressed="'+(APP.filter===k)+'">'+(k==='all'?'Semua · '+APP.pls.length:names[k]+' · '+counts[k])+'</button>';});
-  h+='</nav><div class="card" style="overflow:hidden">';
-  h+='<div class="pl-row pl-head"><span>Picking List · OR</span><span>Customer · Remarks</span><span class="r c-lines">Baris</span><span class="r c-full">Karton penuh</span><span class="r">Baris ecer</span><span>Status</span></div>';
-  if(!rows.length) h+='<div style="padding:24px 18px" class="muted">'+(APP.pls.length?'Tidak ada picking list di filter ini.':'Belum ada picking list. Data dikirim dari Sheet oleh GAS tiap 5 menit.')+'</div>';
+  var names={todo:'Belum dicek',busy:'Sedang dicek',diff:'Ada selisih',done:'Selesai',all:'Semua'};
+  h+='<nav class="tabs" aria-label="Filter status">';
+  ['todo','busy','diff','done','all'].forEach(function(k){h+='<button type="button" class="tab" data-f="'+k+'" aria-pressed="'+(APP.filter===k)+'">'+names[k]+'<span class="cnt">'+(k==='all'?APP.pls.length:counts[k])+'</span></button>';});
+  h+='</nav><div class="cards">';
+  if(!rows.length) h+='<div class="card muted" style="padding:24px 18px">'+(APP.pls.length?'Tidak ada picking list di filter ini.':'Belum ada picking list. Data dikirim dari Sheet oleh GAS.')+'</div>';
   rows.forEach(function(p){
     var full=0,loose=0; (p.lines||[]).forEach(function(l){ if(l.pk){full+=Math.floor(l.qty/l.pk); if(l.qty%l.pk) loose++;} });
-    var status=plStatus(p), heavy=loose>(p.lines||[]).length*CFG.ecerSuggestRatio;
-    var looseTag=loose===0?'<span class="tag t-todo">Tidak ada</span>':'<span class="tag '+(heavy?'t-warn':'t-part')+'">'+loose+' baris'+(heavy?' · mode ecer':'')+'</span>';
-    var mine=p.lock&&APP.me&&p.lock.uid===APP.me.uid;
-    var stLabel=status==='todo'?'Belum dicek':status==='busy'?(lockActive(p)?('Dicek '+(mine?'Anda':(p.lock.id||'')) ):'Terhenti (kunci lepas)'):status==='diff'?'Ada selisih':'Selesai';
-    h+='<div style="position:relative"><button type="button" class="pl-row" data-pl="'+esc(p.pl)+'">'+
-      '<div class="c-pl"><div style="font-size:15px;font-weight:500">PL '+esc(p.pl)+'</div><div class="muted" style="font-size:12px">OR '+esc((p.ors||[]).join(' · '))+'</div></div>'+
-      '<div class="c-cust" style="min-width:0"><div style="font-weight:500" class="ell">'+esc(p.cust)+'</div><div class="muted ell" style="font-size:12px">'+esc(p.rem)+'</div></div>'+
-      '<span class="r c-lines">'+(p.lines||[]).length+'</span><span class="r c-full">'+nf(full)+' ctn</span>'+
-      '<span class="r c-loose">'+looseTag+'</span>'+
-      '<span class="c-st" style="font-size:12px;font-weight:500;color:'+(status==='busy'?'var(--pri)':status==='done'?'var(--ok)':status==='diff'?'var(--err)':'var(--muted)')+'">'+esc(stLabel)+'</span>'+
+    var status=plStatus(p), mine=p.lock&&APP.me&&p.lock.uid===APP.me.uid;
+    var who=status==='busy'?(lockActive(p)?('Dicek '+(mine?'Anda':(p.lock.id||''))):'Kunci lepas'):'';
+    h+='<div class="plwrap"><button type="button" class="plcard" data-pl="'+esc(p.pl)+'">'+
+      '<div class="c-pl"><div class="pl-top">'+stChip(status)+'<span class="plno">PL '+esc(p.pl)+'</span></div>'+
+        '<div class="meta"><span>'+IC2.cal+esc(p.date||'-')+'</span><span>'+IC2.user+'Picker '+esc(p.picker||'-')+'</span>'+(who?'<span class="who-l">'+esc(who)+'</span>':'')+'</div></div>'+
+      '<div class="c-cust col"><span class="lab">Customer</span><span class="val ell">'+esc(p.cust)+'</span><span class="sub ell">OR '+esc((p.ors||[]).join(' · '))+'</span></div>'+
+      '<div class="c-lines col r"><span class="lab">Baris</span><span class="val">'+(p.lines||[]).length+'</span></div>'+
+      '<div class="c-full col r"><span class="lab">Karton</span><span class="val">'+nf(full)+'</span></div>'+
+      '<div class="c-loose col r"><span class="lab">Ecer</span><span class="val">'+(loose?loose+' baris':'-')+'</span></div>'+
+      '<span class="c-go">'+IC2.chev+'</span>'+
     '</button>'+
     (APP.me&&APP.me.role==='admin'&&p.lock&&!mine?'<button type="button" class="btn unlock" data-unlock="'+esc(p.pl)+'">Lepas kunci</button>':'')+
     '</div>';
   });
-  h+='</div></div>';
-  return h;
+  h+='</div>';
+  return shell(top,h);
 }
+
+function vScan(){
+  var pl=plById(APP.pl), s=sess(pl.pl), st=plStats(pl), d=lineDone(pl);
+  var pct=st.tgtPcs?Math.round(st.pcs/st.tgtPcs*100):0;
+  var top=topbar('<div class="crumb tb"><button type="button" class="link" id="bBack">Picking List</button><span>/</span><b>PL '+esc(pl.pl)+'</b></div>');
+  var h='<div class="doc-head"><div style="min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>PL '+esc(pl.pl)+'</h1>'+stChip('busy')+'</div>'+
+    '<div class="muted ell">Tanggal pick '+esc(pl.date||'-')+' · '+esc(pl.cust)+'</div></div>'+
+    '<div class="doc-act"><div class="seg" role="group" aria-label="Satuan hitung"><button type="button" data-mode="ctn" aria-pressed="'+(APP.mode==='ctn')+'">Karton</button><button type="button" data-mode="pcs" aria-pressed="'+(APP.mode==='pcs')+'">Ecer (pcs)</button></div>'+
+    '<div class="seg" role="group" aria-label="Perangkat input"><button type="button" data-in="scanner" aria-pressed="'+(APP.input==='scanner')+'">Scanner</button><button type="button" data-in="camera" aria-pressed="'+(APP.input==='camera')+'">Kamera HP</button></div>'+
+    '<button type="button" class="btn pri" id="bSum">Selesai &amp; ringkasan</button></div></div>';
+  if(APP.plChanged) h+='<div class="note" style="margin-bottom:12px;background:var(--err-soft);color:var(--err)">Picking list ini berubah di SAP/Sheet setelah dibuka. Kembali ke daftar dan buka lagi sebelum lanjut scan.</div>';
+  h+='<div class="dgrid">';
+  // scan
+  h+='<section class="d-scan" aria-label="Panel scan"><div class="scanrow">';
+  if(APP.input==='camera'){
+    h+='<div class="camwrap" id="camBox"><video muted playsinline></video><div class="frame"></div><div class="msg">Membuka kamera…</div></div>';
+  } else {
+    h+='<div class="card scanbox"><div style="display:flex;justify-content:space-between;align-items:center"><label for="scan" style="font-size:13px;font-weight:500">Scan barcode '+(APP.mode==='ctn'?'karton':'(ecer)')+'</label><span class="ready" id="ready"><i></i><span>Siap scan</span></span></div>'+
+      '<input id="scan" class="scaninp" autocomplete="off" autocorrect="off" spellcheck="false" '+(APP.typing?'':'inputmode="none"')+' placeholder="Arahkan scanner ke label karton"'+(APP.blocked?' disabled':'')+'>'+
+      '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="muted" style="font-size:12px">'+(APP.mode==='ctn'?'1 scan = 1 karton (isi sesuai label).':'Scan item, lalu isi jumlah pcs.')+'</span>'+
+      '<button type="button" class="btn" id="bType" style="height:36px;padding:0 10px;font-size:12px">'+(APP.typing?'Sembunyikan keyboard':'Ketik manual')+'</button></div></div>';
+  }
+  h+=vFb()+'</div>';
+  if(APP.mode==='ctn'&&st.looseLines>pl.lines.length*CFG.ecerSuggestRatio&&!okEvents(s).length) h+='<div class="note" style="margin-top:12px">'+st.looseLines+' dari '+pl.lines.length+' baris berupa ecer. Pakai mode "Ecer (pcs)".</div>';
+  h+='</section>';
+
+  // aside
+  var u=APP.me||{};
+  h+='<aside class="d-aside">'+
+    '<div class="card pad mhide">'+steps(plStatus(pl)==='done'||plStatus(pl)==='diff'?plStatus(pl):'busy')+'</div>'+
+    '<div class="card pad"><div class="ctitle">Progress</div>'+
+      '<div class="kpis">'+kpiBtn('log','Karton',nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small>','Lihat log karton yang sudah discan')+
+      kpiBtn('done','Baris',st.doneLines+'<small> / '+st.lines+'</small>','Lihat baris yang sudah lengkap')+
+      kpiBtn('rej','Ditolak','<span style="color:'+(st.rejected?'var(--err)':'inherit')+'">'+st.rejected+'</span>','Lihat scan yang ditolak')+'</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin:10px 0 6px"><span class="muted">'+nf(st.pcs)+' / '+nf(st.tgtPcs)+' pcs</span><span>'+pct+'%</span></div><div class="bar"><div style="width:'+pct+'%"></div></div>'+
+      palRow(s)+
+      '<div class="btn2"><button type="button" class="btn" id="bUndo">Batalkan scan</button><button type="button" class="btn" id="bEcer">Input ecer</button></div>'+
+      '<button type="button" class="btn pri block monly" id="bSum2" style="margin-top:10px;height:52px">Selesai &amp; ringkasan</button></div>'+
+    '<div class="card pad mhide"><div class="ctitle">Checker</div><div class="who">'+avatar(u.id)+'<div><div style="font-weight:500">'+esc(u.name||u.id||'')+'</div><div class="muted" style="font-size:12px">'+esc(u.id||'')+'</div></div></div></div>'+
+    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Baris',String(pl.lines.length))+'</div>'+
+    '<div class="card pad mhide"><div class="ctitle">Customer</div><div style="font-weight:500;margin-bottom:4px">'+esc(pl.cust)+'</div><div class="muted" style="font-size:12px">'+esc(pl.rem)+'</div></div>'+
+  '</aside>';
+
+  // items
+  var errBy=lineErrors(pl,s);
+  var rows=pl.lines.map(function(l){var k=lineKey(l),got=d.pcs[k]||0,rem=l.qty-got;
+    var stt=got>=l.qty?'done':(l.pk&&rem<l.pk&&got>0)?'ecer':got>0?'part':'todo';
+    var err=errBy[k]||0;
+    var grp=stt==='done'?'done':err?'err':got>0?'prog':'todo';
+    if(k===APP.lastLine) grp='cur';
+    return {l:l,k:k,got:got,stt:stt,err:err,grp:grp};});
+  var extra=strayRejects(s);
+  var cnt={all:rows.length+extra.length,prog:0,err:extra.length,todo:0,done:0,log:okEvents(s).length,rej:st.rejected,pal:s.palCount||1};
+  rows.forEach(function(r){
+    if(r.stt==='done') cnt.done++; else if(r.err) cnt.err++; else if(r.got>0) cnt.prog++; else cnt.todo++;
+    if(r.grp==='cur'&&!(r.stt!=='done'&&!r.err&&r.got>0)) cnt.prog++;
+  });
+  var f=APP.itemFilter;
+  var GRP={cur:0,prog:1,err:2,todo:3,done:4};
+  var GNAME={cur:'Sedang dicek',prog:'Sedang dicek',err:'Ada scan salah',todo:'Belum dicek',done:'Selesai & sesuai'};
+  var dg=function(r){return r.grp==='cur'?'prog':r.grp;};
+  var shown=rows.filter(function(r){
+    if(f==='all') return true;
+    if(f==='prog') return r.grp==='cur'||(r.stt!=='done'&&!r.err&&r.got>0);
+    if(f==='err') return r.stt!=='done'&&r.err>0;
+    if(f==='todo') return r.stt!=='done'&&!r.err&&!r.got;
+    if(f==='done') return r.stt==='done';
+    return false;
+  });
+  if(APP.iq){ shown=shown.filter(function(r){return iqMatch([r.l.desc,r.l.code,r.l.batch,r.l.or,'#'+r.l.no]);});
+    extra=extra.filter(function(x){return iqMatch([x.title,x.code,x.batch,x.raw]);}); }
+  shown.sort(function(a,b){return (GRP[a.grp]-GRP[b.grp])||(a.l.no-b.l.no);});
+  h+='<section class="card items d-items" id="itemsSec" aria-label="Daftar item"><nav class="tabs in" aria-label="Filter item">'+
+    [['all','Semua'],['prog','Sedang dicek'],['err','Salah'],['todo','Belum'],['done','Lengkap'],['pal','Palet'],['log','Log'],['rej','Ditolak']].map(function(x){return '<button type="button" class="tab'+(x[0]==='err'&&cnt.err?' t-err':'')+'" data-if="'+x[0]+'" aria-pressed="'+(f===x[0])+'">'+x[1]+'<span class="cnt">'+cnt[x[0]]+'</span></button>';}).join('')+
+    '</nav>'+
+    '<div class="iqrow"><span class="iqico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>'+
+    '<label class="sr" for="iq">Cari item di PL ini</label><input id="iq" class="inp iq" type="search" autocomplete="off" spellcheck="false" placeholder="Cari nama item, kode, atau batch" value="'+esc(APP.iq)+'">'+
+    '<button type="button" class="btn iqx" id="bIqX" aria-label="Hapus pencarian"'+(APP.iq?'':' hidden')+'>×</button></div><div id="itemsBody">'+
+    (APP.iq?'<div class="iqinfo">Hasil cari “'+esc(APP.iq)+'”'+(f==='log'||f==='rej'||f==='pal'?'':': '+(shown.length+((f==='all'||f==='err')?extra.length:0))+' item')+' · tekan Enter atau × untuk kembali scan</div>':'');
+  if(f==='log'||f==='rej'){
+    h+=scanLog(pl,s,f);
+  } else if(f==='pal'){
+    h+=paletView(pl,s);
+  } else {
+    h+='<div class="it head"><span class="c-no">No</span><span>Item</span><span class="c-batch">Batch</span><span class="r c-tgt">Target</span><span class="r c-done">Dicek</span><span class="c-st">Status</span></div>';
+    var tags={done:['chip-g','Lengkap'],ecer:['chip-w','Perlu ecer'],part:['chip-b','Sebagian'],todo:['chip-n','Belum']};
+    var lastG=null, gc={prog:0,err:0,todo:0,done:0};
+    shown.forEach(function(r){gc[dg(r)]++;});
+    if(f==='all'||f==='err') gc.err+=extra.length;
+    var extraDone=!(f==='all'||f==='err');
+    function putExtra(){ if(extraDone) return; extraDone=true; if(!extra.length) return;
+      if(f==='all'&&lastG!=='err'){ h+='<div class="it-grp g-err">'+GNAME.err+'<span>'+gc.err+'</span></div>'; lastG='err'; }
+      extra.forEach(function(x){
+        h+='<div class="it bad"><span class="c-no muted">-</span><div style="min-width:0"><div class="d1 ell">'+esc(x.title)+'</div><div class="d2">'+esc(x.code||x.raw)+'</div>'+
+          '<div class="d3">'+x.n+' scan · '+esc(x.hint)+'</div></div><span class="c-batch mono" style="font-size:13px">'+esc(x.batch||'-')+'</span><span class="r c-tgt" style="font-size:13px">-</span>'+
+          '<span class="r c-done" style="font-size:13px;font-weight:500">'+x.n+' scan</span><span class="c-st"><span class="chip chip-r">'+esc(x.chip)+'</span></span></div>';
+      });
+    }
+    shown.forEach(function(r){var l=r.l;
+      var g=f==='all'?dg(r):null;
+      if(f==='err'||(f==='all'&&GRP[dg(r)]>GRP.err)) putExtra();
+      if(f==='all'&&g!==lastG){ h+='<div class="it-grp g-'+g+'">'+GNAME[g]+'<span>'+gc[g]+'</span></div>'; lastG=g; }
+      var tag=r.stt!=='done'&&r.err?['chip-r','Salah']:tags[r.stt];
+      h+='<div class="it'+(r.k===APP.lastLine?' flash':'')+(r.stt!=='done'&&r.err?' bad':'')+'"><span class="c-no muted">'+l.no+'</span>'+
+        '<div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+((pl.ors||[]).length>1?' · OR '+esc(l.or):'')+
+'</div>'+
+        (r.err?'<div class="d3">'+r.err+' scan ditolak · lihat tab Ditolak</div>':'')+'</div>'+
+        '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span>'+
+        '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'<span class="c-of"> / '+fmtQ(l.qty,l.pk)+'</span></span><span class="c-st"><span class="chip '+tag[0]+'">'+tag[1]+'</span></span></div>';
+    });
+    putExtra();
+    if(!shown.length&&!(extra.length&&(f==='all'||f==='err'))) h+='<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada item yang cocok dengan pencarian.':'Tidak ada item di filter ini.')+'</div>';
+  }
+  h+='</div></section></div>';
+  return shell(top,h);
+}
+/** Perbarui isi daftar item saja (dipakai saat mengetik di kotak cari, supaya input tidak diganti). */
+function renderItemsOnly(){
+  var cur=$('#itemsBody'); if(!cur||APP.view!=='scan'){ render(); return; }
+  var tmp=document.createElement('div'); tmp.innerHTML=vScan();
+  var nb=tmp.querySelector('#itemsBody'); if(!nb){ render(); return; }
+  cur.innerHTML=nb.innerHTML;
+  var x=$('#bIqX'); if(x) x.hidden=!APP.iq;
+  each('#itemsBody [data-pv]',function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-pv'); APP.palView=v==='all'?'all':Number(v); render(); focusScan();});});
+}
+
+function vSum(){
+  var pl=plById(APP.pl), s=sess(pl.pl), st=plStats(pl), d=lineDone(pl);
+  var diffs=pl.lines.filter(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;});
+  var rej=rejectedOf(s);
+  var pal={}; okEvents(s).forEach(function(e){pal[e.palet]=pal[e.palet]||{c:0,p:0}; if(e.kind==='ctn')pal[e.palet].c++; pal[e.palet].p+=e.pcs;});
+  var stNow=s.submitted?(diffs.length?'diff':'done'):'busy';
+  var top=topbar('<div class="crumb tb"><button type="button" class="link" id="bToListC">Picking List</button><span>/</span><button type="button" class="link" id="bBackScan">PL '+esc(pl.pl)+'</button><span>/</span><b>Ringkasan</b></div>');
+  var h='<div class="doc-head"><div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>Ringkasan PL '+esc(pl.pl)+'</h1>'+stChip(stNow)+'</div><div class="muted ell">'+esc(pl.cust)+' · OR '+esc((pl.ors||[]).join(' · '))+'</div></div></div>';
+  h+='<div class="sum-grid"><div style="display:flex;flex-direction:column;gap:14px">';
+  h+='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'+
+    '<div class="card kpi"><span class="l">Baris lengkap</span><span class="v">'+st.doneLines+'<small> / '+st.lines+'</small></span></div>'+
+    '<div class="card kpi"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span></div>'+
+    '<div class="card kpi"><span class="l">Pcs</span><span class="v">'+nf(st.pcs)+'<small> / '+nf(st.tgtPcs)+'</small></span></div>'+
+    '<div class="card kpi" style="'+(st.tgtPcs-st.pcs?'background:var(--err-soft);border-color:var(--err-line)':'')+'"><span class="l">Selisih</span><span class="v" style="color:'+(st.tgtPcs-st.pcs?'var(--err)':'var(--ok)')+'">'+(st.tgtPcs-st.pcs?'-'+nf(st.tgtPcs-st.pcs)+' pcs':'0')+'</span></div></div>';
+  h+='<section class="card ctable"><h2 class="sec-t">Baris dengan selisih · '+diffs.length+'</h2>';
+  if(!diffs.length) h+='<div style="padding:14px" class="muted">Semua baris sesuai.</div>';
+  else{
+    h+='<div class="srow head"><span class="c-no">No</span><span>Item</span><span>Batch</span><span class="r c-tgt">Target</span><span class="r">Dicek</span><span class="r">Selisih</span></div>';
+    diffs.forEach(function(l){var k=lineKey(l),got=d.pcs[k]||0;
+      h+='<div class="srow"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="ell" style="font-weight:500;font-size:13px">'+esc(l.desc)+'</div><div class="muted" style="font-size:12px">'+esc(l.code)+'</div>'+
+      '<label class="sr" for="rs'+k+'">Alasan baris '+l.no+'</label><select id="rs'+k+'" data-rk="'+k+'" class="inp" style="height:40px;margin-top:6px;font-size:13px;max-width:320px"'+(s.submitted?' disabled':'')+'><option value="">Pilih alasan (wajib)</option>'+REASONS.map(function(r){return '<option'+(s.reasons[k]===r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select></div>'+
+      '<span class="mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span><span class="r" style="font-size:13px">'+fmtQ(got,l.pk)+'</span><span class="r" style="color:var(--err);font-weight:500;font-size:13px">-'+nf(l.qty-got)+' pcs</span></div>';});
+  }
+  h+='</section>';
+  h+='<section class="card" style="overflow:hidden"><h2 class="sec-t">Log scan ditolak · '+rej.length+'</h2>';
+  if(!rej.length) h+='<div style="padding:14px" class="muted">Tidak ada.</div>';
+  rej.slice(-100).reverse().forEach(function(e){h+='<div style="display:grid;grid-template-columns:76px minmax(0,200px) minmax(0,1fr);gap:10px;padding:9px 14px;border-bottom:1px solid var(--line2);font-size:13px"><span class="muted">'+hhmm(e.t)+'</span><span class="mono ell">'+esc((e.code||'')+' · '+(e.batch||e.raw||''))+'</span><span>'+esc(REJ_NAME[e.res]||e.res)+'</span></div>';});
+  h+='</section></div>';
+  h+='<aside style="display:flex;flex-direction:column;gap:12px">';
+  if(s.submitted) h+='<div class="note" style="background:var(--ok-soft);color:var(--ok)">Sudah disubmit'+(s.submitted==='pending'?' (menunggu koneksi untuk terkirim)':'')+'. Kunci PL sudah dilepas.</div>';
+  h+='<div class="card pad">'+steps(stNow)+'</div>';
+  h+='<div class="card pad"><div class="ctitle">Detail sesi</div>'+
+    kv('Checker',(APP.me||{}).id||'-')+kv('Picker',pl.picker)+kv('Mulai',s.startedAt?hhmm(s.startedAt):'-')+kv('Scan diterima',String(okEvents(s).length))+'</div>';
+  h+='<div class="card pad"><div class="ctitle">Per palet</div>';
+  var pk=Object.keys(pal); if(!pk.length) h+='<span class="muted">Belum ada.</span>';
+  pk.forEach(function(p){h+=kv('Palet '+p,nf(pal[p].c)+' ctn · '+nf(pal[p].p)+' pcs');});
+  h+='</div>';
+  if(!s.submitted){
+    if(diffs.length) h+='<div class="note">PL dengan selisih masuk status "Ada selisih" dan perlu persetujuan admin.</div>';
+    var sep=sepRejects(s).length;
+    if(sep){ var okSep=s.rejOkCount===sep;
+      h+='<label class="sepok'+(okSep?' on':'')+'" for="cSep"><input type="checkbox" id="cSep"'+(okSep?' checked':'')+'>'+
+        '<span><b>Semua karton yang ditolak sudah dipisahkan</b><small>'+sep+' scan ditolak (batch salah, melebihi target, tidak ada di PL, barcode rusak). Pastikan kartonnya tidak ikut di palet kirim.</small></span></label>'; }
+    h+='<button type="button" class="btn" id="bBackScan2">Kembali scan</button>';
+    h+='<button type="button" class="btn pri" id="bSubmit" style="height:52px">'+(diffs.length?'Submit dengan selisih':'Submit')+'</button>';
+  }
+  h+='<button type="button" class="btn" id="bToList">Ke daftar PL</button>';
+  h+='</aside></div>';
+  return shell(top,h);
+}
+
 
 function vFb(){
   var f=APP.fb;
@@ -620,62 +967,6 @@ function vFb(){
     (f.actions||[]).forEach(function(x,i){h+='<button type="button" class="btn" data-act="'+i+'">'+esc(x.label)+'</button>';});
     h+='</div>';}
   return h+'</div></div>';
-}
-
-function vScan(){
-  var pl=plById(APP.pl), s=sess(pl.pl), st=plStats(pl), d=lineDone(pl);
-  var pct=st.tgtPcs?Math.round(st.pcs/st.tgtPcs*100):0;
-  var h='<header class="top top-scan"><button class="iconbtn" id="bBack" type="button" aria-label="Kembali ke daftar">'+ICON.back+'</button>'+
-    '<div class="grow"><h1>PL '+esc(pl.pl)+' <span class="muted" style="font-size:13px;font-weight:400">OR '+esc((pl.ors||[]).join(' · '))+'</span></h1><div class="sub">'+esc(pl.cust)+' · '+esc(pl.rem)+'</div></div>'+
-    '<span id="syncState" style="font-size:12px"></span>'+
-    '<div class="seg" role="group" aria-label="Satuan hitung"><button type="button" data-mode="ctn" aria-pressed="'+(APP.mode==='ctn')+'">Karton</button><button type="button" data-mode="pcs" aria-pressed="'+(APP.mode==='pcs')+'">Ecer (pcs)</button></div>'+
-    '<div class="seg" role="group" aria-label="Perangkat input"><button type="button" data-in="scanner" aria-pressed="'+(APP.input==='scanner')+'">Scanner</button><button type="button" data-in="camera" aria-pressed="'+(APP.input==='camera')+'">Kamera HP</button></div>'+
-    '</header>';
-  h+='<div class="wrap">';
-  if(APP.plChanged) h+='<div class="note" style="margin-bottom:12px;background:var(--err-soft);color:var(--err)">Picking list ini berubah di SAP/Sheet setelah dibuka. Kembali ke daftar dan buka lagi sebelum lanjut scan.</div>';
-  h+='<div class="scan-grid"><section class="panel" aria-label="Panel scan">';
-  if(APP.input==='camera'){
-    h+='<div class="camwrap" id="camBox"><video muted playsinline></video><div class="frame"></div><div class="msg">Membuka kamera…</div></div>';
-  } else {
-    h+='<div class="card scanbox"><div style="display:flex;justify-content:space-between;align-items:center"><label for="scan" style="font-size:13px;font-weight:500">Scan barcode '+(APP.mode==='ctn'?'karton':'(ecer)')+'</label><span class="ready" id="ready"><i></i><span>Siap scan</span></span></div>'+
-      '<input id="scan" class="scaninp" autocomplete="off" autocorrect="off" spellcheck="false" '+(APP.typing?'':'inputmode="none"')+' placeholder="Arahkan scanner ke label karton"'+(APP.blocked?' disabled':'')+'>'+
-      '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="muted" style="font-size:12px">'+(APP.mode==='ctn'?'1 scan = 1 karton (isi sesuai label).':'Scan item, lalu isi jumlah pcs.')+'</span>'+
-      '<button type="button" class="btn" id="bType" style="height:36px;padding:0 10px;font-size:12px">'+(APP.typing?'Sembunyikan keyboard':'Ketik manual')+'</button></div></div>';
-  }
-  h+=vFb();
-  if(APP.mode==='ctn'&&st.looseLines>pl.lines.length*CFG.ecerSuggestRatio&&!okEvents(s).length) h+='<div class="note">'+st.looseLines+' dari '+pl.lines.length+' baris berupa ecer. Pakai mode "Ecer (pcs)".</div>';
-  h+='<div class="kpis"><div class="card kpi"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span></div>'+
-     '<div class="card kpi"><span class="l">Baris lengkap</span><span class="v">'+st.doneLines+'<small> / '+st.lines+'</small></span></div>'+
-     '<div class="card kpi"><span class="l">Ditolak</span><span class="v" style="color:'+(st.rejected?'var(--err)':'inherit')+'">'+st.rejected+'</span></div></div>';
-  h+='<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span class="muted">'+nf(st.pcs)+' / '+nf(st.tgtPcs)+' pcs</span><span>'+pct+'%</span></div><div class="bar"><div style="width:'+pct+'%"></div></div></div>';
-  h+='<div class="card" style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span>Palet aktif: <b style="font-weight:500">'+s.palet+'</b></span><button type="button" class="btn" id="bPalet" style="height:40px">Palet baru +</button></div>';
-  h+='<div class="btn2"><button type="button" class="btn" id="bUndo">Batalkan scan terakhir</button><button type="button" class="btn" id="bEcer">Input ecer / campuran</button></div>';
-  h+='<button type="button" class="btn pri block" id="bSum" style="height:52px">Selesai &amp; lihat ringkasan</button>';
-  h+='</section>';
-
-  var rows=pl.lines.map(function(l){var k=lineKey(l),got=d.pcs[k]||0,rem=l.qty-got;
-    var stt=got>=l.qty?'done':(l.pk&&rem<l.pk&&got>0)?'ecer':got>0?'part':'todo'; return {l:l,k:k,got:got,stt:stt};});
-  var cnt={open:0,ecer:0,done:0,all:rows.length};
-  function isEcer(r){return r.stt==='ecer'||(r.stt!=='done'&&r.l.pk&&r.l.qty%r.l.pk);}
-  rows.forEach(function(r){if(r.stt==='done')cnt.done++;else cnt.open++; if(isEcer(r))cnt.ecer++;});
-  var f=APP.itemFilter;
-  var shown=rows.filter(function(r){return f==='all'||(f==='done'&&r.stt==='done')||(f==='open'&&r.stt!=='done')||(f==='ecer'&&isEcer(r));});
-  var ord={part:1,ecer:2,todo:3,done:4};
-  shown.sort(function(a,b){ if(a.k===APP.lastLine) return -1; if(b.k===APP.lastLine) return 1; return (ord[a.stt]-ord[b.stt])||(a.l.no-b.l.no); });
-  h+='<section class="card items" aria-label="Daftar item"><div class="items-top"><nav class="seg" aria-label="Filter item">'+
-    [['open','Belum lengkap'],['ecer','Ada ecer'],['done','Lengkap'],['all','Semua']].map(function(x){return '<button type="button" data-if="'+x[0]+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' · '+cnt[x[0]]+'</button>';}).join('')+
-    '</nav><span class="muted" style="font-size:12px">Urut: terakhir discan, lalu belum</span></div>';
-  h+='<div class="it head"><span class="c-no">No</span><span>Item</span><span class="c-batch">Batch</span><span class="r c-tgt">Target</span><span class="r c-done">Dicek</span><span class="c-st">Status</span></div>';
-  var tags={done:['t-done','Lengkap'],ecer:['t-warn','Perlu ecer'],part:['t-part','Sebagian'],todo:['t-todo','Belum']};
-  shown.forEach(function(r){var l=r.l;
-    h+='<div class="it'+(r.k===APP.lastLine?' flash':'')+'"><span class="c-no muted">'+l.no+'</span>'+
-      '<div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+((pl.ors||[]).length>1?' · OR '+esc(l.or):'')+'</div></div>'+
-      '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span>'+
-      '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'<span class="c-of"> / '+fmtQ(l.qty,l.pk)+'</span></span><span class="c-st"><span class="tag '+tags[r.stt][0]+'">'+tags[r.stt][1]+'</span></span></div>';
-  });
-  if(!shown.length) h+='<div style="padding:20px 14px" class="muted">Tidak ada item di filter ini.</div>';
-  h+='</section></div></div>';
-  return h;
 }
 
 function vModal(){
@@ -698,46 +989,93 @@ function vModal(){
 var REASONS=['Kurang pick - kembalikan ke picker','Stok fisik tidak ada','Karton rusak','Lainnya'];
 var REJ_NAME={NOTIN:'Item tidak ada di PL',BATCH:'Batch tidak sesuai',OVER:'Melebihi target',REMAIN:'Sisa ecer (karton penuh ditolak)',FORMAT:'Barcode tidak dikenali'};
 function rejectedOf(s){return s.events.filter(function(e){return REJ_NAME[e.res];});}
-function vSum(){
-  var pl=plById(APP.pl), s=sess(pl.pl), st=plStats(pl), d=lineDone(pl);
-  var diffs=pl.lines.filter(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;});
-  var rej=rejectedOf(s);
-  var pal={}; okEvents(s).forEach(function(e){pal[e.palet]=pal[e.palet]||{c:0,p:0}; if(e.kind==='ctn')pal[e.palet].c++; pal[e.palet].p+=e.pcs;});
-  var h='<header class="top top-scan"><button class="iconbtn" id="bBackScan" type="button" aria-label="Kembali ke scan">'+ICON.back+'</button><div class="grow"><h1>Ringkasan · PL '+esc(pl.pl)+'</h1><div class="sub">'+esc(pl.cust)+' · OR '+esc((pl.ors||[]).join(' · '))+'</div></div><span id="syncState" style="font-size:12px"></span></header>';
-  h+='<div class="wrap"><div class="sum-grid"><div style="display:flex;flex-direction:column;gap:14px">';
-  h+='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'+
-    '<div class="card kpi"><span class="l">Baris lengkap</span><span class="v">'+st.doneLines+'<small> / '+st.lines+'</small></span></div>'+
-    '<div class="card kpi"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span></div>'+
-    '<div class="card kpi"><span class="l">Pcs</span><span class="v">'+nf(st.pcs)+'<small> / '+nf(st.tgtPcs)+'</small></span></div>'+
-    '<div class="card kpi" style="'+(st.tgtPcs-st.pcs?'background:var(--err-soft);border-color:var(--err-line)':'')+'"><span class="l">Selisih</span><span class="v" style="color:'+(st.tgtPcs-st.pcs?'var(--err)':'var(--ok)')+'">'+(st.tgtPcs-st.pcs?'-'+nf(st.tgtPcs-st.pcs)+' pcs':'0')+'</span></div></div>';
-  h+='<section class="card ctable"><h2 class="sec-t">Baris dengan selisih · '+diffs.length+'</h2>';
-  if(!diffs.length) h+='<div style="padding:14px" class="muted">Semua baris sesuai.</div>';
-  else{
-    h+='<div class="srow head"><span class="c-no">No</span><span>Item</span><span>Batch</span><span class="r c-tgt">Target</span><span class="r">Dicek</span><span class="r">Selisih</span></div>';
-    diffs.forEach(function(l){var k=lineKey(l),got=d.pcs[k]||0;
-      h+='<div class="srow"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="ell" style="font-weight:500;font-size:13px">'+esc(l.desc)+'</div><div class="muted" style="font-size:12px">'+esc(l.code)+'</div>'+
-      '<label class="sr" for="rs'+k+'">Alasan baris '+l.no+'</label><select id="rs'+k+'" data-rk="'+k+'" class="inp" style="height:40px;margin-top:6px;font-size:13px;max-width:320px"><option value="">Pilih alasan (wajib)</option>'+REASONS.map(function(r){return '<option'+(s.reasons[k]===r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select></div>'+
-      '<span class="mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span><span class="r" style="font-size:13px">'+fmtQ(got,l.pk)+'<span class="c-of" style="display:none"></span></span><span class="r" style="color:var(--err);font-weight:500;font-size:13px">-'+nf(l.qty-got)+' pcs</span></div>';});
-  }
-  h+='</section>';
-  h+='<section class="card" style="overflow:hidden"><h2 class="sec-t">Log scan ditolak · '+rej.length+'</h2>';
-  if(!rej.length) h+='<div style="padding:14px" class="muted">Tidak ada.</div>';
-  rej.slice(-100).reverse().forEach(function(e){h+='<div style="display:grid;grid-template-columns:76px minmax(0,200px) minmax(0,1fr);gap:10px;padding:9px 14px;border-bottom:1px solid var(--line2);font-size:13px"><span class="muted">'+hhmm(e.t)+'</span><span class="mono ell">'+esc((e.code||'')+' · '+(e.batch||e.raw||''))+'</span><span>'+esc(REJ_NAME[e.res]||e.res)+'</span></div>';});
-  h+='</section></div>';
-  h+='<aside style="display:flex;flex-direction:column;gap:12px"><div class="card" style="padding:14px;display:flex;flex-direction:column;gap:8px"><span style="font-weight:500">Detail sesi</span>'+
-    kv('Checker',(APP.me||{}).id||'-')+kv('Picker',pl.picker)+kv('Mulai',s.startedAt?hhmm(s.startedAt):'-')+kv('Scan diterima',String(okEvents(s).length))+'</div>';
-  h+='<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-weight:500">Per palet</span>';
-  var pk=Object.keys(pal); if(!pk.length) h+='<span class="muted">Belum ada.</span>';
-  pk.forEach(function(p){h+=kv('Palet '+p,nf(pal[p].c)+' ctn · '+nf(pal[p].p)+' pcs');});
+/** Jumlah scan salah per baris: batch salah & melebihi target. (Sisa ecer bukan salah.) */
+function lineErrors(pl,s){
+  var out={};
+  s.events.forEach(function(e){
+    if(e.res!=='BATCH'&&e.res!=='OVER') return;
+    var k=e.line;
+    if(!k&&e.code){ var l=pl.lines.filter(function(x){return x.code===e.code;})[0]; if(l) k=lineKey(l); }
+    if(k) out[k]=(out[k]||0)+1;
+  });
+  return out;
+}
+/** Cocokkan kata kunci pencarian (semua kata harus ada) ke deskripsi/kode/batch/OR/No. */
+function iqMatch(parts){
+  var q=String(APP.iq||'').trim().toLowerCase(); if(!q) return true;
+  var hay=parts.map(function(x){return String(x==null?'':x);}).join(' ').toLowerCase();
+  return q.split(/\s+/).every(function(w){return hay.indexOf(w)>=0;});
+}
+/** Scan ditolak yang kartonnya harus dipisahkan secara fisik (sisa ecer tidak termasuk). */
+function sepRejects(s){return s.events.filter(function(e){return ['BATCH','OVER','NOTIN','FORMAT'].indexOf(e.res)>=0;});}
+/** Scan ditolak yang tidak menempel ke baris PL: item tidak ada di PL & barcode tidak dikenali. */
+function strayRejects(s){
+  var m={}, out=[];
+  s.events.forEach(function(e){
+    if(e.res!=='NOTIN'&&e.res!=='FORMAT') return;
+    var key=e.res+'|'+(e.res==='NOTIN'?(e.code+'|'+e.batch):(e.raw||''));
+    if(!m[key]){ m[key]={n:0,code:e.code||'',batch:e.batch||'',raw:(e.raw||'').slice(0,60),
+      title:e.res==='NOTIN'?'Item tidak ada di PL ini':'Barcode tidak dikenali',
+      chip:e.res==='NOTIN'?'Tidak di PL':'Barcode rusak',
+      hint:e.res==='NOTIN'?'pisahkan, kembalikan ke picker':'cek label karton'}; out.push(m[key]); }
+    m[key].n++;
+  });
+  return out;
+}
+function palStats(s){
+  var p={}; okEvents(s).forEach(function(e){var n=e.palet||1; p[n]=p[n]||{c:0,p:0}; if(e.kind==='ctn')p[n].c++; p[n].p+=e.pcs;});
+  return p;
+}
+function palRow(s){
+  var n=Math.max(s.palCount||1,s.palet), ps=palStats(s), h='<div class="palrow2"><div class="ctitle" style="margin:0">Palet aktif</div><div class="pals" role="group" aria-label="Pilih palet aktif">';
+  for(var i=1;i<=n;i++){ var x=ps[i]||{c:0,p:0};
+    h+='<button type="button" class="pal" data-pal="'+i+'" aria-pressed="'+(s.palet===i)+'"><b>'+i+'</b><small>'+nf(x.c)+' ctn</small></button>'; }
+  h+='<button type="button" class="pal add" id="bPalet" aria-label="Tambah palet baru">+<small>Baru</small></button></div></div>';
+  return h;
+}
+/** Isi per palet: baris PL yang discan ke palet tsb. */
+function paletView(pl,s){
+  var n=Math.max(s.palCount||1,s.palet), byK={}, agg={}, h='';
+  pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
+  okEvents(s).forEach(function(e){var p=e.palet||1; agg[p]=agg[p]||{}; var a=agg[p][e.line]=agg[p][e.line]||{c:0,p:0}; if(e.kind==='ctn')a.c++; a.p+=e.pcs;});
+  var v=APP.palView;
+  h+='<div class="pvbar" role="group" aria-label="Tampilkan palet"><button type="button" class="pal sm" data-pv="all" aria-pressed="'+(v==='all')+'">Semua</button>';
+  for(var i=1;i<=n;i++) h+='<button type="button" class="pal sm" data-pv="'+i+'" aria-pressed="'+(v===i)+'">Palet '+i+'</button>';
   h+='</div>';
-  if(s.submitted) h+='<div class="note" style="background:var(--ok-soft);color:var(--ok)">Sudah disubmit'+(s.submitted==='pending'?' (menunggu koneksi untuk terkirim)':'')+'. Kunci PL sudah dilepas.</div>';
-  else {
-    if(diffs.length) h+='<div class="note">PL dengan selisih masuk status "Ada selisih" dan perlu persetujuan admin.</div>';
-    h+='<button type="button" class="btn" id="bBackScan2">Kembali scan</button>';
-    h+='<button type="button" class="btn pri" id="bSubmit" style="height:52px">'+(diffs.length?'Submit dengan selisih':'Submit')+'</button>';
+  for(var j=1;j<=n;j++){
+    if(v!=='all'&&v!==j) continue;
+    var rows=agg[j]||{}, keys=Object.keys(rows).filter(function(k){var l=byK[k]; return !l||iqMatch([l.desc,l.code,l.batch,l.or,'#'+l.no]);}).sort(function(a,b){return (byK[a]?byK[a].no:0)-(byK[b]?byK[b].no:0);});
+    var tc=0,tp=0; keys.forEach(function(k){tc+=rows[k].c;tp+=rows[k].p;});
+    h+='<div class="it-grp g-prog">Palet '+j+(s.palet===j?' · aktif':'')+'<span>'+nf(tc)+' ctn · '+nf(tp)+' pcs · '+keys.length+' item</span></div>';
+    if(!keys.length){ h+='<div style="padding:12px 14px" class="muted">Belum ada scan di palet ini.</div>'; continue; }
+    keys.forEach(function(k){var l=byK[k]||{no:'-',desc:k,code:'',batch:'',pk:0};
+      h+='<div class="it"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+'</div></div>'+
+        '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+nf(rows[k].c)+' ctn</span>'+
+        '<span class="r c-done" style="font-size:13px;font-weight:500">'+nf(rows[k].p)+' pcs</span><span class="c-st"></span></div>';
+    });
   }
-  h+='<button type="button" class="btn" id="bToList">Ke daftar PL</button>';
-  h+='</aside></div></div>';
+  return h;
+}
+function kpiBtn(f,label,val,aria){
+  return '<button type="button" class="kpi kbtn" data-kf="'+f+'" aria-pressed="'+(APP.itemFilter===f)+'" aria-label="'+esc(aria)+'"><span class="l">'+label+' <span aria-hidden="true">›</span></span><span class="v">'+val+'</span></button>';
+}
+/** Log scan diterima (f='log') atau ditolak (f='rej'), terbaru di atas. */
+function scanLog(pl,s,f){
+  var list=f==='log'?okEvents(s):rejectedOf(s), h='';
+  var byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
+  if(APP.iq) list=list.filter(function(e){var l=byK[e.line]; return iqMatch([l?l.desc:'',e.code,e.batch,e.raw,l?'#'+l.no:'']);});
+  if(!list.length) return '<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada scan yang cocok dengan pencarian.':f==='log'?'Belum ada scan diterima.':'Tidak ada scan yang ditolak.')+'</div>';
+  h+='<div class="lg head"><span>Jam</span><span>Item</span><span class="c-batch">Batch</span><span class="r">'+(f==='log'?'Jumlah':'Hasil')+'</span><span class="c-pal">'+(f==='log'?'Palet':'Oleh')+'</span></div>';
+  list.slice(-300).reverse().forEach(function(e){
+    var l=byK[e.line];
+    var nm=l?l.desc:(e.code||e.raw||'');
+    var sub=l?('Baris '+l.no+' · '+(e.code||'')):(e.res==='FORMAT'?'Isi barcode':String(e.raw||'').slice(0,48));
+    if(!l&&e.res==='FORMAT') nm=String(e.raw||'').slice(0,60);
+    var q=f==='log'?(e.kind==='ctn'?'+1 ctn':'+'+nf(e.pcs)+' pcs'):'<span class="chip '+(e.res==='REMAIN'?'chip-w':'chip-r')+'">'+esc(REJ_NAME[e.res]||e.res)+'</span>';
+    h+='<div class="lg"><span class="muted">'+hhmm(e.t)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(nm)+'</div><div class="d2">'+esc(sub)+'</div></div>'+
+      '<span class="c-batch mono" style="font-size:13px">'+esc(e.batch||'-')+'</span><span class="r" style="font-size:13px;font-weight:500">'+q+'</span><span class="c-pal muted" style="font-size:12px">'+esc(f==='log'?('P'+(e.palet||1)):(e.by||''))+'</span></div>';
+  });
+  if(list.length>300) h+='<div style="padding:10px 14px" class="muted">Menampilkan 300 terakhir dari '+list.length+'.</div>';
   return h;
 }
 function kv(k,v){return '<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px"><span class="muted">'+esc(k)+'</span><span>'+esc(v)+'</span></div>';}
@@ -755,8 +1093,8 @@ async function openPl(id){
   try{ evs=await DB.loadEvents(id); }catch(e){ toast('Gagal memuat log scan: '+(e.code||e.message)); }
   var s=sess(id); s.events=evs; s.submitted=false;
   s.startedAt=evs.length?evs[0].t:null;
-  s.palet=evs.reduce(function(m,e){return Math.max(m,e.palet||1);},1);
-  APP.pl=id; APP.view='scan'; APP.fb=null; APP.blocked=null; APP.lastLine=null; APP.lastRaw=''; APP.plChanged=false; APP.plHash=p.hash||null;
+  s.palet=evs.reduce(function(m,e){return Math.max(m,e.palet||1);},1); s.palCount=Math.max(s.palCount||1,s.palet);
+  APP.pl=id; APP.view='scan'; APP.itemFilter='all'; APP.palView='all'; APP.iq=''; APP.iqFocus=false; APP.fb=null; APP.blocked=null; APP.lastLine=null; APP.lastRaw=''; APP.plChanged=false; APP.plHash=p.hash||null;
   var st=plStats(p); APP.mode=(st.looseLines>p.lines.length*CFG.ecerSuggestRatio)?'pcs':'ctn';
   if(APP.unsubPl) APP.unsubPl();
   APP.unsubPl=DB.watchPl(id,function(d){ if(APP.plHash&&d.hash&&d.hash!==APP.plHash&&!APP.plChanged){APP.plChanged=true; if(APP.view==='scan')render();} });
@@ -773,9 +1111,16 @@ function submitPl(){
   var pl=plById(APP.pl), s=sess(pl.pl), d=lineDone(pl);
   var miss=pl.lines.filter(function(l){var k=lineKey(l);return (d.pcs[k]||0)!==l.qty&&!s.reasons[k];});
   if(miss.length){toast(miss.length+' baris selisih belum diisi alasannya.');var f=document.querySelector('[data-rk="'+lineKey(miss[0])+'"]'); if(f)f.focus(); return;}
+  var sepN=sepRejects(s).length;
+  if(sepN&&s.rejOkCount!==sepN){ toast('Centang dulu: semua karton yang ditolak sudah dipisahkan.'); var c=$('#cSep'); if(c){c.focus(); c.parentNode.classList.add('need');} return; }
   var hasDiff=pl.lines.some(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;});
   s.finishedAt=now();
+  var scanners={}; s.events.forEach(function(e){ var who=e.by||String(e.id||'').split('-')[0]; if(who&&e.res!=='UNDO') scanners[who]=1; });
+  var stt=plStats(pl);
   var result={pl:pl.pl,status:hasDiff?'diff':'done',startedAt:s.startedAt,finishedAt:s.finishedAt,hash:pl.hash||'',
+    cust:pl.cust||'',ors:pl.ors||[],scanners:Object.keys(scanners),tgtPcs:stt.tgtPcs,pcsTotal:stt.pcs,
+    diffLines:pl.lines.filter(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;}).length,rejectedCount:stt.rejected,
+    rejSeparated:sepN?true:null,rejSeparatedCount:sepN,
     lines:pl.lines.map(function(l){var k=lineKey(l);return {no:l.no,or:l.or||'',code:l.code,batch:l.batch,qty:l.qty,pcs:d.pcs[k]||0,ctn:d.ctn[k]||0,reason:(d.pcs[k]||0)!==l.qty?(s.reasons[k]||''):''};}),
     rejected:rejectedOf(s).slice(-300).map(function(e){return {t:e.t,code:e.code||'',batch:e.batch||'',res:e.res,raw:(e.raw||'').slice(0,160)};})};
   var pend=APP.pending.splice(0); clearTimeout(APP.flushT); APP.flushT=null;
@@ -793,9 +1138,14 @@ function submitPl(){
 
 /* ================= Event binding ================= */
 function on(id,ev,fn){var el=document.getElementById(id); if(el) el.addEventListener(ev,fn);}
-function focusScan(){ if(APP.view!=='scan'||APP.modal||APP.input!=='scanner') return; var i=$('#scan'); if(i&&!i.disabled){ i.focus(); } }
+function focusScan(){ if(APP.view!=='scan'||APP.modal||APP.input!=='scanner'||APP.iqFocus) return; var i=$('#scan'); if(i&&!i.disabled){ i.focus(); } }
 function each(sel,fn){Array.prototype.forEach.call(document.querySelectorAll(sel),fn);}
+function doLogout(){ if(APP.pl){ flush(); camStop(); stopHeartbeat(); if(APP.unsubPl){APP.unsubPl();APP.unsubPl=null;} APP.pl=null; } DB.logout(); }
 function bind(){
+  if(APP.view!=='login'){
+    on('bOut','click',doLogout); on('bOutM','click',doLogout);
+    on('navPL','click',function(){ if(APP.view!=='list') leavePl(); });
+  }
   if(APP.view==='login'){
     on('fLogin','submit',function(e){e.preventDefault(); audioInit();
       var id=$('#uid').value.trim().toUpperCase(), pin=$('#pin').value.trim();
@@ -815,7 +1165,6 @@ function bind(){
     return;
   }
   if(APP.view==='list'){
-    on('bOut','click',function(){DB.logout();});
     var q=$('#q'); if(q){ q.addEventListener('input',function(){APP.q=q.value; var pos=q.selectionStart; render(); var q2=$('#q'); q2.focus(); try{q2.setSelectionRange(pos,pos);}catch(e){}});
       q.addEventListener('keydown',function(e){ if(e.key==='Enter'){ var v=q.value.trim(); var p=plById(v)||APP.pls.filter(function(x){return (x.ors||[]).indexOf(v)>=0;})[0]; if(p) openPl(p.pl); else toast('PL '+v+' tidak ditemukan.'); }}); }
     each('[data-f]',function(b){b.addEventListener('click',function(){APP.filter=b.getAttribute('data-f');render();});});
@@ -837,14 +1186,35 @@ function bind(){
     if(APP.fb&&APP.fb.actions) APP.fb.actions.forEach(function(x,i){var b=document.querySelector('[data-act="'+i+'"]'); if(b) b.addEventListener('click',x.fn);});
     on('bUndo','click',undo);
     on('bEcer','click',function(){openEcer(null,'Sisa ecer / karton campuran');});
-    on('bSum','click',function(){camStop();flush();APP.view='sum';render();window.scrollTo(0,0);});
+    var goSum=function(){camStop();flush();APP.view='sum';render();window.scrollTo(0,0);};
+    on('bSum','click',goSum); on('bSum2','click',goSum);
     on('bType','click',function(){APP.typing=!APP.typing;render();focusScan();});
-    on('bPalet','click',function(){var s=sess(APP.pl); s.palet++; toast('Palet '+s.palet+' aktif. Scan berikutnya masuk palet ini.'); render(); focusScan();});
+    on('bPalet','click',function(){var s=sess(APP.pl); s.palCount=Math.max(s.palCount||1,s.palet)+1; s.palet=s.palCount; toast('Palet '+s.palet+' dibuat dan aktif. Scan berikutnya masuk palet ini.'); render(); focusScan();});
+    each('[data-pal]',function(b){b.addEventListener('click',function(){var s=sess(APP.pl), n=Number(b.getAttribute('data-pal')); if(s.palet!==n){ s.palet=n; toast('Palet '+n+' aktif. Scan berikutnya masuk palet ini.'); } render(); focusScan();});});
+    each('[data-pv]',function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-pv'); APP.palView=v==='all'?'all':Number(v); render(); focusScan();});});
     each('[data-mode]',function(b){b.addEventListener('click',function(){APP.mode=b.getAttribute('data-mode');render();focusScan();});});
     each('[data-in]',function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-in'); if(v!==APP.input){camStop();APP.input=v;render(); if(v==='camera')camStart(); else focusScan();}});});
     each('[data-if]',function(b){b.addEventListener('click',function(){APP.itemFilter=b.getAttribute('data-if');render();focusScan();});});
+    var iq=$('#iq');
+    if(iq){
+      iq.addEventListener('focus',function(){APP.iqFocus=true;});
+      iq.addEventListener('blur',function(){ setTimeout(function(){ if(document.activeElement!==$('#iq')){ APP.iqFocus=false; var a=document.activeElement; if(!a||a===document.body) focusScan(); } },0); });
+      iq.addEventListener('input',function(){ APP.iq=iq.value; renderItemsOnly(); });
+      iq.addEventListener('keydown',function(e){
+        if(e.key==='Escape'){ e.preventDefault(); APP.iq=''; APP.iqFocus=false; render(); focusScan(); return; }
+        if(e.key==='Enter'){ e.preventDefault(); var v=iq.value.trim();
+          // Scanner sempat menembak ke kotak cari: proses sebagai scan, jangan jadi kata kunci.
+          if(v.indexOf(';')>=0){ APP.iq=''; APP.iqFocus=false; handleScan(v,'scanner'); focusScan(); return; }
+          APP.iqFocus=false; iq.blur(); render(); focusScan(); }
+      });
+    }
+    on('bIqX','click',function(){ APP.iq=''; APP.iqFocus=false; render(); focusScan(); });
+    each('[data-kf]',function(b){b.addEventListener('click',function(){var f=b.getAttribute('data-kf'); APP.itemFilter=APP.itemFilter===f?'all':f; render();
+      var sec=$('#itemsSec'); if(sec&&sec.scrollIntoView) sec.scrollIntoView({behavior:'smooth',block:'start'}); focusScan();});});
     if(APP.input==='camera'&&!APP.cam) camStart();
-    if(APP.modal) bindModal(); else setTimeout(focusScan,10);
+    if(APP.modal) bindModal();
+    else if(APP.iqFocus&&$('#iq')){ var qi=$('#iq'); qi.focus(); try{qi.setSelectionRange(qi.value.length,qi.value.length);}catch(e){} }
+    else setTimeout(focusScan,10);
     return;
   }
   if(APP.view==='sum'){
@@ -852,8 +1222,10 @@ function bind(){
     on('bBackScan','click',function(){ if(s.submitted){leavePl();return;} APP.view='scan';startHeartbeat();render();});
     on('bBackScan2','click',function(){APP.view='scan';render();});
     on('bToList',  'click',leavePl);
+    on('bToListC', 'click',leavePl);
     each('[data-rk]',function(sel){sel.addEventListener('change',function(){s.reasons[sel.getAttribute('data-rk')]=sel.value; lsSet('pchk_rs_'+APP.pl,s.reasons);});});
     on('bSubmit','click',submitPl);
+    on('cSep','change',function(e){ var s=sess(APP.pl); s.rejOkCount=e.target.checked?sepRejects(s).length:null; render(); });
   }
 }
 function bindModal(){
