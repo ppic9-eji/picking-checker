@@ -73,7 +73,7 @@ button{cursor:pointer}
 .ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* scan */
-.scan-grid{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;align-items:start}
+.scan-grid{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:16px;align-items:start}
 .panel{display:flex;flex-direction:column;gap:12px;position:sticky;top:80px}
 .scanbox{padding:14px;display:flex;flex-direction:column;gap:8px}
 .scaninp{height:56px;border:2px solid var(--pri);border-radius:10px;padding:0 14px;font-size:16px;width:100%;outline:3px solid var(--pri-soft)}
@@ -94,12 +94,13 @@ button{cursor:pointer}
 .kpi{padding:12px;display:flex;flex-direction:column;gap:2px}
 .kpi .l{font-size:12px;color:var(--muted)}.kpi .v{font-size:20px;font-weight:500}.kpi .v small{font-size:13px;color:var(--muted);font-weight:400}
 .btn2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.items{overflow:hidden}
+.items,.ctable{overflow:hidden;container-type:inline-size}
 .items-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.it{display:grid;grid-template-columns:44px minmax(0,1fr) 116px 130px 130px 104px;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line2)}
+.it{display:grid;grid-template-columns:40px minmax(160px,1fr) 108px 112px 112px 96px;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line2)}
+.it .c-of{display:none}
 .it.head{background:var(--head);font-size:12px;color:var(--muted)}
 .it.flash{background:#F2FBF7}
-.it .d1{font-size:13px;font-weight:500}.it .d2{font-size:12px;color:var(--muted)}
+.it .d1{font-size:13px;font-weight:500}.it .d2{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .camwrap{position:relative;background:#1C2433;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3}
 .camwrap video{width:100%;height:100%;object-fit:cover;display:block}
 .camwrap .frame{position:absolute;inset:18% 12%;border:3px solid #fff;border-radius:14px;pointer-events:none}
@@ -119,26 +120,33 @@ button{cursor:pointer}
 
 /* summary */
 .sum-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
-.srow{display:grid;grid-template-columns:44px minmax(0,1fr) 110px 120px 120px 100px;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line2);align-items:center}
+.srow{display:grid;grid-template-columns:40px minmax(160px,1fr) 104px 108px 108px 96px;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line2);align-items:center}
 .srow.head{background:var(--head);font-size:12px;color:var(--muted)}
 .sec-t{margin:0;padding:12px 14px;font-size:15px;font-weight:500;border-bottom:1px solid var(--line2)}
 textarea.out{width:100%;min-height:140px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px}
 
+
+/* tabel menyesuaikan lebar panelnya sendiri (bukan lebar layar) */
+@container (max-width: 760px){
+  .it{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
+  .it.head{display:none}
+  .it .c-no,.it .c-tgt{display:none}
+  .it > div{grid-column:1 / -1}
+  .it .c-batch{grid-column:1}
+  .it .c-done{grid-column:2;text-align:right!important}
+  .it .c-of{display:inline;color:var(--muted);font-weight:400}
+  .it .c-st{grid-column:3;justify-self:end}
+  .srow{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
+  .srow.head{display:none}
+  .srow .c-no,.srow .c-tgt{display:none}
+  .srow > div{grid-column:1 / -1}
+}
 @media (max-width: 980px){
   .scan-grid,.sum-grid{grid-template-columns:1fr}
   .panel{position:static}
   .pl-row{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px}
   .pl-row.pl-head{display:none}
   .pl-row .c-lines,.pl-row .c-full{display:none}
-  .it{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}
-  .it.head{display:none}
-  .it .c-no{display:none}
-  .it .c-batch{grid-column:1}
-  .it .c-tgt{grid-column:1;text-align:left!important}
-  .it .c-done{grid-column:2;grid-row:1;text-align:right!important}
-  .it .c-st{grid-column:2;grid-row:2;justify-self:end}
-  .srow{grid-template-columns:minmax(0,1fr) auto}
-  .srow.head{display:none}.srow .c-no{display:none}
   .erow{grid-template-columns:1fr}
   .top{padding:8px 12px}
   .wrap{padding:12px}
@@ -640,7 +648,7 @@ function vScan(){
     h+='<div class="it'+(r.k===APP.lastLine?' flash':'')+'"><span class="c-no muted">'+l.no+'</span>'+
       '<div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+((pl.ors||[]).length>1?' · OR '+esc(l.or):'')+'</div></div>'+
       '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span>'+
-      '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'</span><span class="c-st"><span class="tag '+tags[r.stt][0]+'">'+tags[r.stt][1]+'</span></span></div>';
+      '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'<span class="c-of"> / '+fmtQ(l.qty,l.pk)+'</span></span><span class="c-st"><span class="tag '+tags[r.stt][0]+'">'+tags[r.stt][1]+'</span></span></div>';
   });
   if(!shown.length) h+='<div style="padding:20px 14px" class="muted">Tidak ada item di filter ini.</div>';
   h+='</section></div></div>';
@@ -679,14 +687,14 @@ function vSum(){
     '<div class="card kpi"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span></div>'+
     '<div class="card kpi"><span class="l">Pcs</span><span class="v">'+nf(st.pcs)+'<small> / '+nf(st.tgtPcs)+'</small></span></div>'+
     '<div class="card kpi" style="'+(st.tgtPcs-st.pcs?'background:var(--err-soft);border-color:var(--err-line)':'')+'"><span class="l">Selisih</span><span class="v" style="color:'+(st.tgtPcs-st.pcs?'var(--err)':'var(--ok)')+'">'+(st.tgtPcs-st.pcs?'-'+nf(st.tgtPcs-st.pcs)+' pcs':'0')+'</span></div></div>';
-  h+='<section class="card" style="overflow:hidden"><h2 class="sec-t">Baris dengan selisih · '+diffs.length+'</h2>';
+  h+='<section class="card ctable"><h2 class="sec-t">Baris dengan selisih · '+diffs.length+'</h2>';
   if(!diffs.length) h+='<div style="padding:14px" class="muted">Semua baris sesuai.</div>';
   else{
-    h+='<div class="srow head"><span class="c-no">No</span><span>Item</span><span>Batch</span><span class="r">Target</span><span class="r">Dicek</span><span class="r">Selisih</span></div>';
+    h+='<div class="srow head"><span class="c-no">No</span><span>Item</span><span>Batch</span><span class="r c-tgt">Target</span><span class="r">Dicek</span><span class="r">Selisih</span></div>';
     diffs.forEach(function(l){var k=lineKey(l),got=d.pcs[k]||0;
       h+='<div class="srow"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="ell" style="font-weight:500;font-size:13px">'+esc(l.desc)+'</div><div class="muted" style="font-size:12px">'+esc(l.code)+'</div>'+
       '<label class="sr" for="rs'+k+'">Alasan baris '+l.no+'</label><select id="rs'+k+'" data-rk="'+k+'" class="inp" style="height:40px;margin-top:6px;font-size:13px;max-width:320px"><option value="">Pilih alasan (wajib)</option>'+REASONS.map(function(r){return '<option'+(s.reasons[k]===r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select></div>'+
-      '<span class="mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span><span class="r" style="font-size:13px">'+fmtQ(got,l.pk)+'</span><span class="r" style="color:var(--err);font-weight:500;font-size:13px">-'+nf(l.qty-got)+' pcs</span></div>';});
+      '<span class="mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span><span class="r" style="font-size:13px">'+fmtQ(got,l.pk)+'<span class="c-of" style="display:none"></span></span><span class="r" style="color:var(--err);font-weight:500;font-size:13px">-'+nf(l.qty-got)+' pcs</span></div>';});
   }
   h+='</section>';
   h+='<section class="card" style="overflow:hidden"><h2 class="sec-t">Log scan ditolak · '+rej.length+'</h2>';
