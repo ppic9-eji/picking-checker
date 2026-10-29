@@ -527,12 +527,37 @@ var APP={view:'boot',me:null,authMsg:'',pls:[],plsErr:'',pl:null,filter:'all',sa
   pending:[],flushT:null,hbT:null,unsubPl:null,unsubList:null,plHash:null,plChanged:false,busy:false,syncState:'ok'};
 var SESS={};
 
-function plById(id){for(var i=0;i<APP.pls.length;i++)if(APP.pls[i].pl===id)return APP.pls[i];return null;}
+function plById(id){for(var i=0;i<APP.pls.length;i++)if(APP.pls[i].pl===id)return ensureKeys(APP.pls[i]);return null;}
 function sess(id){
   if(!SESS[id]) SESS[id]={events:[],reasons:lsGet('pchk_rs_'+id)||{},palet:1,palCount:1,startedAt:null,finishedAt:null,checker:null,submitted:false};
   return SESS[id];
 }
-function lineKey(l){return String(l.no);}
+/* Kunci baris PL. "No" dari SAP/Sheet TIDAK selalu unik dalam satu PL (mis. baris lama yang tertinggal
+   setelah PL diubah di SAP), jadi kunci = No + ItemCode + Batch (+ nomor urut bila tetap kembar). */
+function baseKey(l){return (String(l.no)+'_'+String(l.code||'')+'_'+String(l.batch||'')).replace(/[^A-Za-z0-9_-]/g,'-');}
+function ensureKeys(pl){
+  if(!pl||!pl.lines||pl._kd) return pl;
+  var seen={};
+  pl.lines.forEach(function(l){var k=baseKey(l); seen[k]=(seen[k]||0)+1; l._k=seen[k]>1?(k+'_'+seen[k]):k;});
+  pl._kd=true; return pl;
+}
+function lineKey(l){return l._k||baseKey(l);}
+/** Event lama menyimpan line = No saja. Petakan ke kunci baru lewat No + ItemCode + Batch. */
+function migrateLineRefs(pl,s){
+  ensureKeys(pl);
+  var keys={}, byNo={};
+  pl.lines.forEach(function(l){keys[l._k]=1; (byNo[String(l.no)]=byNo[String(l.no)]||[]).push(l);});
+  function map(old,code,batch){
+    if(old==null||keys[old]) return old;
+    var c=byNo[String(old)]; if(!c||!c.length) return old;
+    if(c.length===1) return c[0]._k;
+    var B=String(batch||'').toUpperCase();
+    var m=c.filter(function(l){return l.code===code&&String(l.batch).toUpperCase()===B;})[0]||c.filter(function(l){return l.code===code;})[0];
+    return m?m._k:old;
+  }
+  s.events.forEach(function(e){ if(e.line!=null) e.line=map(e.line,e.code,e.batch); });
+  var r2={}; Object.keys(s.reasons||{}).forEach(function(k){ var c=byNo[k]; r2[keys[k]?k:(c&&c.length===1?c[0]._k:k)]=s.reasons[k]; }); s.reasons=r2;
+}
 function undoneSet(s){var u={};s.events.forEach(function(e){if(e.res==='UNDO'&&e.ref)u[e.ref]=1;});return u;}
 function okEvents(s){var u=undoneSet(s);return s.events.filter(function(e){return e.res==='OK'&&!u[e.id];});}
 function lineDone(pl){
@@ -1195,7 +1220,7 @@ async function openPl(id){
   }catch(e){ toast('Gagal mengunci PL: '+(e.code||e.message)+'. Pastikan ada koneksi.'); return; }
   var evs=[];
   try{ evs=await DB.loadEvents(id); }catch(e){ toast('Gagal memuat log scan: '+(e.code||e.message)); }
-  var s=sess(id); s.events=evs; s.submitted=false;
+  var s=sess(id); s.events=evs; s.submitted=false; migrateLineRefs(p,s);
   s.startedAt=evs.length?evs[0].t:null;
   s.palet=evs.reduce(function(m,e){return Math.max(m,e.palet||1);},1); s.palCount=Math.max(s.palCount||1,s.palet);
   APP.pl=id; APP.view='scan'; APP.itemFilter='all'; APP.palView='all'; APP.iq=''; APP.iqFocus=false; APP.fb=null; APP.blocked=null; APP.lastLine=null; APP.lastRaw=''; APP.plChanged=false; APP.plHash=p.hash||null;
@@ -1494,14 +1519,14 @@ window.addEventListener('pagehide',function(){ flush(); });
     if(!me){ APP.view='login'; if(msg) APP.authMsg=msg; APP.pls=[]; render(); return; }
     APP.authMsg=''; APP.view='list'; render();
     APP.unsubList=DB.watchPicklists(function(list){
-      APP.pls=list; APP.plsErr='';
+      list.forEach(ensureKeys); APP.pls=list; APP.plsErr='';
       if(APP.view==='list') render();
     },function(err){ APP.plsErr='Gagal memuat daftar PL: '+(err.code||err.message); if(APP.view==='list') render(); });
   });
 })();
 
 /* hook untuk diagnosa dari console browser (read-only use) */
-window.__pchk = { APP: APP, CFG: CFG, SESS: SESS, sess: sess, plById: plById, lineDone: lineDone, plStats: plStats };
+window.__pchk = { APP: APP, CFG: CFG, SESS: SESS, sess: sess, plById: plById, lineDone: lineDone, plStats: plStats, lineKey: lineKey };
 
 </script>
 </body>
