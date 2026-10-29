@@ -115,6 +115,25 @@ button{cursor:pointer}
 .pal[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:#fff}.pal[aria-pressed="true"] small{color:#D6EAF1}
 .pal.add{border-style:dashed;color:var(--pri);font-size:16px}
 .pal.sm{flex-direction:row;height:34px;min-width:0;font-size:13px}
+.chip.sap{background:#fff;border:1px solid var(--line);color:var(--ink);gap:6px;padding:0 8px 0 4px;font-weight:400}
+.chip.sap .sap-k{font-size:10px;font-weight:500;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#EEF2F7;color:var(--muted)}
+.chip.sap-r .sap-k{background:var(--pri-soft);color:var(--pri)}
+.chip.sap-y .sap-k{background:var(--ok-soft);color:var(--ok)}
+.chip.sap-p .sap-k{background:var(--warn-soft);color:var(--warn)}
+.chip.sap-c{color:var(--muted)}
+.pl-top{flex-wrap:wrap}
+.sapf{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-2px 0 12px}
+.sapf-l{font-size:12px;color:var(--muted);margin-right:4px}
+.sapf .pal.sm{gap:6px;padding:0 10px}
+.sapf .cnt{font-size:11px;background:#EEF2F7;color:var(--muted);padding:0 7px;border-radius:999px}
+.sapf .pal[aria-pressed="true"] .cnt{background:rgba(255,255,255,.22);color:#fff}
+.ctnnote{display:flex;gap:8px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:500}
+.ctnnote i{width:8px;height:8px;border-radius:999px;flex:none;background:currentColor}
+.ctnnote.c-ok{background:var(--ok-soft);color:var(--ok)}.ctnnote.c-warn{background:var(--warn-soft);color:var(--warn)}
+.ctnnote.c-err{background:var(--err-soft);color:var(--err)}.ctnnote.c-n{background:#EEF2F7;color:var(--muted)}
+.kpi .ks{font-size:12px;font-weight:500;margin-top:2px}
+.kpi.kc-ok .ks{color:var(--ok)}.kpi.kc-warn .ks{color:var(--warn)}.kpi.kc-err .ks{color:var(--err)}.kpi.kc-n .ks{color:var(--muted)}
+.kpi.kc-ok{border-color:#A8D8C4}.kpi.kc-warn{background:var(--warn-soft);border-color:#E9C98B}
 .iqrow{position:relative;display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line2)}
 .iqico{position:absolute;left:26px;top:50%;transform:translateY(-50%);color:var(--muted);display:flex}
 .inp.iq{height:40px;padding-left:36px;font-size:14px;flex:1;min-width:0}
@@ -475,7 +494,7 @@ function parseBarcode(raw){
 
 /* ================= State ================= */
 var DB=null;
-var APP={view:'boot',me:null,authMsg:'',pls:[],plsErr:'',pl:null,filter:'all',q:'',mode:'ctn',input:'scanner',itemFilter:'all',palView:'all',iq:'',iqFocus:false,
+var APP={view:'boot',me:null,authMsg:'',pls:[],plsErr:'',pl:null,filter:'all',sapF:'all',q:'',mode:'ctn',input:'scanner',itemFilter:'all',palView:'all',iq:'',iqFocus:false,
   fb:null,blocked:null,lastRaw:'',lastT:0,lastLine:null,modal:null,cam:null,typing:false,
   pending:[],flushT:null,hbT:null,unsubPl:null,unsubList:null,plHash:null,plChanged:false,busy:false,syncState:'ok'};
 var SESS={};
@@ -726,6 +745,12 @@ var IC2={
   out:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>'
 };
 var ST_CHIP={todo:['chip-w','Belum dicek'],busy:['chip-b','Sedang dicek'],diff:['chip-r','Ada selisih'],done:['chip-g','Selesai']};
+/* Status SAP (kolom Status di PickingList_Data). Kode huruf dipetakan ke nama SAP B1 (perlu dicek ke SAP). */
+var SAP_NAME={R:'Released',Y:'Picked',P:'Partially Picked',D:'Partially Delivered',C:'Closed'};
+function sapLabel(v){return String(v||'').split(' / ').map(function(x){x=x.trim();return SAP_NAME[x.toUpperCase()]||x;}).filter(Boolean).join(' / ');}
+function sapChip(p){var t=sapLabel(p&&p.sap); if(!t) return '';
+  var k=t.toLowerCase(), c=k.indexOf('closed')>=0?'sap-c':k.indexOf('partial')>=0?'sap-p':k.indexOf('picked')>=0?'sap-y':'sap-r';
+  return '<span class="chip sap '+c+'" title="Status picking list di SAP"><span class="sap-k">SAP</span>'+esc(t)+'</span>';}
 function stChip(st){var c=ST_CHIP[st]||ST_CHIP.todo;return '<span class="chip '+c[0]+'">'+c[1]+'</span>';}
 function avatar(id){return '<span class="avatar">'+esc(String(id||'?').slice(0,2).toUpperCase())+'</span>';}
 
@@ -748,12 +773,16 @@ function steps(st){
 }
 
 function vList(){
+  var sapCnt={}, sapOrder=[];
+  APP.pls.forEach(function(p){var t=sapLabel(p.sap)||'Tanpa status'; if(!sapCnt[t]){sapCnt[t]=0;sapOrder.push(t);} sapCnt[t]++;});
+  if(APP.sapF!=='all'&&!sapCnt[APP.sapF]) APP.sapF='all';
+  var base=APP.pls.filter(function(p){return APP.sapF==='all'||(sapLabel(p.sap)||'Tanpa status')===APP.sapF;});
   var counts={todo:0,busy:0,diff:0,done:0};
-  APP.pls.forEach(function(p){counts[plStatus(p)]++;});
+  base.forEach(function(p){counts[plStatus(p)]++;});
   var q=APP.q.trim().toLowerCase();
-  var rows=APP.pls.filter(function(p){
+  var rows=base.filter(function(p){
     var st=plStatus(p); if(APP.filter!=='all'&&st!==APP.filter) return false;
-    if(!q) return true; return (p.pl+' '+(p.ors||[]).join(' ')+' '+p.cust+' '+p.rem).toLowerCase().indexOf(q)>=0;
+    if(!q) return true; return (p.pl+' '+(p.ors||[]).join(' ')+' '+p.cust+' '+p.rem+' '+sapLabel(p.sap)).toLowerCase().indexOf(q)>=0;
   });
   var top=topbar('<div class="tsearch has-search">'+ICON.search+'<label class="sr" for="q">Cari picking list</label><input id="q" value="'+esc(APP.q)+'" placeholder="Scan / ketik No. PL, OR, atau customer lalu Enter"></div>');
   var h='<div class="crumb">Operasional <span>/</span> <b>Picking List</b></div>';
@@ -761,15 +790,23 @@ function vList(){
   if(APP.plsErr) h+='<div class="note" style="background:var(--err-soft);color:var(--err);margin-bottom:12px">'+esc(APP.plsErr)+'</div>';
   var names={todo:'Belum dicek',busy:'Sedang dicek',diff:'Ada selisih',done:'Selesai',all:'Semua'};
   h+='<nav class="tabs" aria-label="Filter status">';
-  ['all','todo','busy','diff','done'].forEach(function(k){h+='<button type="button" class="tab" data-f="'+k+'" aria-pressed="'+(APP.filter===k)+'">'+names[k]+'<span class="cnt">'+(k==='all'?APP.pls.length:counts[k])+'</span></button>';});
-  h+='</nav><div class="cards">';
+  ['all','todo','busy','diff','done'].forEach(function(k){h+='<button type="button" class="tab" data-f="'+k+'" aria-pressed="'+(APP.filter===k)+'">'+names[k]+'<span class="cnt">'+(k==='all'?base.length:counts[k])+'</span></button>';});
+  h+='</nav>';
+  if(sapOrder.length){
+    var SAP_RANK=['Released','Picked','Partially Picked','Partially Delivered','Closed'];
+    sapOrder.sort(function(a,b){var x=SAP_RANK.indexOf(a),y=SAP_RANK.indexOf(b); return (x<0?99:x)-(y<0?99:y)||(a<b?-1:1);});
+    h+='<div class="sapf" role="group" aria-label="Filter status SAP"><span class="sapf-l">Status SAP</span>'+
+      '<button type="button" class="pal sm" data-sapf="all" aria-pressed="'+(APP.sapF==='all')+'">Semua<span class="cnt">'+APP.pls.length+'</span></button>'+
+      sapOrder.map(function(t){return '<button type="button" class="pal sm" data-sapf="'+esc(t)+'" aria-pressed="'+(APP.sapF===t)+'">'+esc(t)+'<span class="cnt">'+sapCnt[t]+'</span></button>';}).join('')+'</div>';
+  }
+  h+='<div class="cards">';
   if(!rows.length) h+='<div class="card muted" style="padding:24px 18px">'+(APP.pls.length?'Tidak ada picking list di filter ini.':'Belum ada picking list. Data dikirim dari Sheet oleh GAS.')+'</div>';
   rows.forEach(function(p){
     var full=0,loose=0; (p.lines||[]).forEach(function(l){ if(l.pk){full+=Math.floor(l.qty/l.pk); if(l.qty%l.pk) loose++;} });
     var status=plStatus(p), mine=p.lock&&APP.me&&p.lock.uid===APP.me.uid;
     var who=status==='busy'?(lockActive(p)?('Dicek '+(mine?'Anda':(p.lock.id||''))):'Kunci lepas'):'';
     h+='<div class="plwrap"><button type="button" class="plcard" data-pl="'+esc(p.pl)+'">'+
-      '<div class="c-pl"><div class="pl-top">'+stChip(status)+'<span class="plno">PL '+esc(p.pl)+'</span></div>'+
+      '<div class="c-pl"><div class="pl-top">'+stChip(status)+'<span class="plno">PL '+esc(p.pl)+'</span>'+sapChip(p)+'</div>'+
         '<div class="meta"><span>'+IC2.cal+esc(p.date||'-')+'</span><span>'+IC2.user+'Picker '+esc(p.picker||'-')+'</span>'+(who?'<span class="who-l">'+esc(who)+'</span>':'')+'</div></div>'+
       '<div class="c-cust col"><span class="lab">Customer</span><span class="val ell">'+esc(p.cust)+'</span><span class="sub ell">OR '+esc((p.ors||[]).join(' · '))+'</span></div>'+
       '<div class="c-lines col r"><span class="lab">Item</span><span class="val">'+(p.lines||[]).length+'</span></div>'+
@@ -788,7 +825,7 @@ function vScan(){
   var pl=plById(APP.pl), s=sess(pl.pl), st=plStats(pl), d=lineDone(pl);
   var pct=st.tgtPcs?Math.round(st.pcs/st.tgtPcs*100):0;
   var top=topbar('<div class="crumb tb"><button type="button" class="link" id="bBack">Picking List</button><span>/</span><b>PL '+esc(pl.pl)+'</b></div>');
-  var h='<div class="doc-head"><div style="min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>PL '+esc(pl.pl)+'</h1>'+stChip('busy')+'</div>'+
+  var h='<div class="doc-head"><div style="min-width:0"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>PL '+esc(pl.pl)+'</h1>'+stChip('busy')+sapChip(pl)+'</div>'+
     '<div class="muted ell">Tanggal pick '+esc(pl.date||'-')+' · '+esc(pl.cust)+'</div></div>'+
     '<div class="doc-act"><div class="seg" role="group" aria-label="Satuan hitung"><button type="button" data-mode="ctn" aria-pressed="'+(APP.mode==='ctn')+'">Karton</button><button type="button" data-mode="pcs" aria-pressed="'+(APP.mode==='pcs')+'">Ecer (pcs)</button></div>'+
     '<div class="seg" role="group" aria-label="Perangkat input"><button type="button" data-in="scanner" aria-pressed="'+(APP.input==='scanner')+'">Scanner</button><button type="button" data-in="camera" aria-pressed="'+(APP.input==='camera')+'">Kamera HP</button></div>'+
@@ -816,13 +853,13 @@ function vScan(){
     '<div class="card pad"><div class="ctitle">Progress</div>'+
       '<div class="kpis">'+kpiBtn('log','Karton',nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small>','Lihat log karton yang sudah discan')+
       kpiBtn('done','Item',st.doneLines+'<small> / '+st.lines+'</small>','Lihat item yang sudah lengkap')+
-      kpiBtn('rej','Ditolak','<span style="color:'+(st.rejected?'var(--err)':'inherit')+'">'+st.rejected+'</span>','Lihat scan yang ditolak')+'</div>'+
+      kpiBtn('rej','Ditolak','<span style="color:'+(st.rejected?'var(--err)':'inherit')+'">'+st.rejected+'</span>','Lihat scan yang ditolak')+'</div>'+ctnNote(st)+
       '<div style="display:flex;justify-content:space-between;font-size:12px;margin:10px 0 6px"><span class="muted">'+nf(st.pcs)+' / '+nf(st.tgtPcs)+' pcs</span><span>'+pct+'%</span></div><div class="bar"><div style="width:'+pct+'%"></div></div>'+
       palRow(s)+
       '<div class="btn2"><button type="button" class="btn" id="bUndo">Batalkan scan</button><button type="button" class="btn" id="bEcer">Input ecer</button></div>'+
       '<button type="button" class="btn pri block monly" id="bSum2" style="margin-top:10px;height:52px">Selesai &amp; ringkasan</button></div>'+
     '<div class="card pad mhide"><div class="ctitle">Checker</div><div class="who">'+avatar(u.id)+'<div><div style="font-weight:500">'+esc(u.name||u.id||'')+'</div><div class="muted" style="font-size:12px">'+esc(u.id||'')+'</div></div></div></div>'+
-    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Item',String(pl.lines.length))+'</div>'+
+    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Status SAP',sapLabel(pl.sap)||'-')+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Item',String(pl.lines.length))+'</div>'+
     '<div class="card pad mhide"><div class="ctitle">Customer</div><div style="font-weight:500;margin-bottom:4px">'+esc(pl.cust)+'</div><div class="muted" style="font-size:12px">'+esc(pl.rem)+'</div></div>'+
   '</aside>';
 
@@ -916,11 +953,11 @@ function vSum(){
   var pal={}; okEvents(s).forEach(function(e){pal[e.palet]=pal[e.palet]||{c:0,p:0}; if(e.kind==='ctn')pal[e.palet].c++; pal[e.palet].p+=e.pcs;});
   var stNow=s.submitted?(diffs.length?'diff':'done'):'busy';
   var top=topbar('<div class="crumb tb"><button type="button" class="link" id="bToListC">Picking List</button><span>/</span><button type="button" class="link" id="bBackScan">PL '+esc(pl.pl)+'</button><span>/</span><b>Ringkasan</b></div>');
-  var h='<div class="doc-head"><div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>Ringkasan PL '+esc(pl.pl)+'</h1>'+stChip(stNow)+'</div><div class="muted ell">'+esc(pl.cust)+' · OR '+esc((pl.ors||[]).join(' · '))+'</div></div></div>';
+  var h='<div class="doc-head"><div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>Ringkasan PL '+esc(pl.pl)+'</h1>'+stChip(stNow)+sapChip(pl)+'</div><div class="muted ell">'+esc(pl.cust)+' · OR '+esc((pl.ors||[]).join(' · '))+'</div></div></div>';
   h+='<div class="sum-grid"><div style="display:flex;flex-direction:column;gap:14px">';
   h+='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'+
     '<div class="card kpi"><span class="l">Item lengkap</span><span class="v">'+st.doneLines+'<small> / '+st.lines+'</small></span></div>'+
-    '<div class="card kpi"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span></div>'+
+    (function(){var c=ctnState(st); return '<div class="card kpi kc-'+c.cls+'"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span><span class="ks">'+esc(c.short)+'</span></div>';})()+
     '<div class="card kpi"><span class="l">Pcs</span><span class="v">'+nf(st.pcs)+'<small> / '+nf(st.tgtPcs)+'</small></span></div>'+
     '<div class="card kpi" style="'+(st.tgtPcs-st.pcs?'background:var(--err-soft);border-color:var(--err-line)':'')+'"><span class="l">Selisih</span><span class="v" style="color:'+(st.tgtPcs-st.pcs?'var(--err)':'var(--ok)')+'">'+(st.tgtPcs-st.pcs?'-'+nf(st.tgtPcs-st.pcs)+' pcs':'0')+'</span></div></div>';
   h+='<section class="card ctable"><h2 class="sec-t">Item dengan selisih · '+diffs.length+'</h2>';
@@ -1062,6 +1099,14 @@ function paletView(pl,s){
   }
   return h;
 }
+/** Keterangan: karton penuh yang discan vs total karton penuh di PL. */
+function ctnState(st){
+  if(!st.fullTgt) return {cls:'n',short:'Tidak ada karton penuh',text:'PL ini tidak punya karton penuh (semua ecer).'};
+  if(st.ctn===st.fullTgt) return {cls:'ok',short:'Sesuai',text:'Karton penuh sesuai: '+nf(st.ctn)+' / '+nf(st.fullTgt)+' ctn'};
+  if(st.ctn<st.fullTgt) return {cls:'warn',short:'Kurang '+nf(st.fullTgt-st.ctn)+' ctn',text:'Karton penuh belum sesuai: kurang '+nf(st.fullTgt-st.ctn)+' ctn ('+nf(st.ctn)+' / '+nf(st.fullTgt)+')'};
+  return {cls:'err',short:'Lebih '+nf(st.ctn-st.fullTgt)+' ctn',text:'Karton penuh lebih '+nf(st.ctn-st.fullTgt)+' ctn ('+nf(st.ctn)+' / '+nf(st.fullTgt)+')'};
+}
+function ctnNote(st){var c=ctnState(st); return '<div class="ctnnote c-'+c.cls+'" role="status"><i aria-hidden="true"></i><span>'+esc(c.text)+'</span></div>';}
 function kpiBtn(f,label,val,aria){
   return '<button type="button" class="kpi kbtn" data-kf="'+f+'" aria-pressed="'+(APP.itemFilter===f)+'" aria-label="'+esc(aria)+'"><span class="l">'+label+' <span aria-hidden="true">›</span></span><span class="v">'+val+'</span></button>';
 }
@@ -1124,7 +1169,7 @@ function submitPl(){
   var scanners={}; s.events.forEach(function(e){ var who=e.by||String(e.id||'').split('-')[0]; if(who&&e.res!=='UNDO') scanners[who]=1; });
   var stt=plStats(pl);
   var result={pl:pl.pl,status:hasDiff?'diff':'done',startedAt:s.startedAt,finishedAt:s.finishedAt,hash:pl.hash||'',
-    cust:pl.cust||'',ors:pl.ors||[],scanners:Object.keys(scanners),tgtPcs:stt.tgtPcs,pcsTotal:stt.pcs,
+    cust:pl.cust||'',ors:pl.ors||[],sap:pl.sap||'',tgtCtn:stt.fullTgt,ctnTotal:stt.ctn,scanners:Object.keys(scanners),tgtPcs:stt.tgtPcs,pcsTotal:stt.pcs,
     diffLines:pl.lines.filter(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;}).length,rejectedCount:stt.rejected,
     rejSeparated:sepN?true:null,rejSeparatedCount:sepN,
     lines:pl.lines.map(function(l){var k=lineKey(l);return {no:l.no,or:l.or||'',code:l.code,batch:l.batch,qty:l.qty,pcs:d.pcs[k]||0,ctn:d.ctn[k]||0,reason:(d.pcs[k]||0)!==l.qty?(s.reasons[k]||''):''};}),
@@ -1174,6 +1219,7 @@ function bind(){
     var q=$('#q'); if(q){ q.addEventListener('input',function(){APP.q=q.value; var pos=q.selectionStart; render(); var q2=$('#q'); q2.focus(); try{q2.setSelectionRange(pos,pos);}catch(e){}});
       q.addEventListener('keydown',function(e){ if(e.key==='Enter'){ var v=q.value.trim(); var p=plById(v)||APP.pls.filter(function(x){return (x.ors||[]).indexOf(v)>=0;})[0]; if(p) openPl(p.pl); else toast('PL '+v+' tidak ditemukan.'); }}); }
     each('[data-f]',function(b){b.addEventListener('click',function(){APP.filter=b.getAttribute('data-f');render();});});
+    each('[data-sapf]',function(b){b.addEventListener('click',function(){APP.sapF=b.getAttribute('data-sapf');render();});});
     each('[data-pl]',function(b){b.addEventListener('click',function(){openPl(b.getAttribute('data-pl'));});});
     each('[data-unlock]',function(b){b.addEventListener('click',function(ev){ev.stopPropagation(); var id=b.getAttribute('data-unlock');
       DB.forceUnlock(id).then(function(){toast('Kunci PL '+id+' dilepas.');},function(e){toast('Gagal: '+(e.code||e.message));});});});
