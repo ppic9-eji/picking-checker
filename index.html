@@ -101,7 +101,7 @@ button{cursor:pointer}
 .btn2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .items,.ctable{overflow:hidden;container-type:inline-size}
 .items-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.it{display:grid;grid-template-columns:40px minmax(160px,1fr) 108px 112px 112px 96px;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line2)}
+.it{display:grid;grid-template-columns:40px minmax(160px,1fr) 108px 112px 112px 150px;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line2)}
 .it .c-of{display:none}
 .it.head{background:var(--head);font-size:12px;color:var(--muted)}
 .it.flash{background:#F0FAF4}
@@ -112,6 +112,12 @@ button{cursor:pointer}
 .tab.t-err .cnt{background:var(--err-soft);color:var(--err)}
 .tabs.in{gap:0}@container (min-width: 561px){.tabs.in{flex-wrap:wrap;overflow:visible}}.tabs.in .tab{padding:0 8px;gap:6px;font-size:13px}
 .it .d3{font-size:12px;color:var(--err);font-weight:500}
+.it.t8{grid-template-columns:36px minmax(150px,1fr) 96px 104px 76px 64px 112px 136px;gap:10px}
+.it .tdet{display:none;font-size:12px;color:var(--muted)}
+.it .c-tp,.it .c-td{color:var(--ink)}
+.it .dpcs{display:block;font-size:11px;font-weight:400;color:var(--muted)}
+.it.t8 .d1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
+.it .dg{font-size:11px;color:var(--pri);font-weight:500}
 .palrow2{display:flex;flex-direction:column;gap:8px;margin:12px 0 10px;padding-top:12px;border-top:1px solid var(--line2)}
 .pals,.pvbar{display:flex;flex-wrap:wrap;gap:6px}
 .pvbar{padding:10px 14px;border-bottom:1px solid var(--line2)}
@@ -127,6 +133,11 @@ button{cursor:pointer}
 .chip.sap-p .sap-k{background:var(--warn-soft);color:var(--warn)}
 .chip.sap-c{color:var(--muted)}
 .pl-top{flex-wrap:wrap}
+.c-st{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rbtn{height:28px;padding:0 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap}
+.rbtn:hover{border-color:var(--err-line);color:var(--err)}
+.rbtn.on{background:var(--err-dot);border-color:var(--err-dot);color:#fff;font-weight:500}
+.c-act{display:flex;justify-content:flex-end}
 .xbar{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;margin:10px 0 6px}
 .xchk{display:flex;gap:8px;align-items:center;cursor:pointer}
 .xlist{max-height:46vh;overflow:auto;border:1px solid var(--line2);border-radius:10px}
@@ -163,7 +174,7 @@ button{cursor:pointer}
 .kbtn:hover{background:var(--pri-soft)}
 .kbtn[aria-pressed="true"]{background:var(--pri-soft);border-color:var(--pri)}
 .kbtn .l span{color:var(--pri)}
-.lg{display:grid;grid-template-columns:76px minmax(160px,1fr) 108px 150px 56px;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line2);font-size:13px}
+.lg{display:grid;grid-template-columns:76px minmax(160px,1fr) 108px 150px 56px 72px;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line2);font-size:13px}
 .lg.head{background:var(--head);font-size:12px;color:var(--muted)}
 .lg .d1{font-size:13px;font-weight:500}.lg .d2{font-size:12px;color:var(--muted)}
 .it .d1{font-size:13px;font-weight:500}.it .d2{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -211,8 +222,16 @@ textarea.out{width:100%;min-height:140px;border:1px solid var(--line);border-rad
   .srow{grid-template-columns:minmax(140px,1fr) 92px 100px 92px 84px;gap:8px;padding:10px 12px}
   .srow .c-no{display:none}
 }
+@container (max-width: 880px){
+  .it.t8{grid-template-columns:minmax(120px,1fr) 86px 100px 104px 120px;gap:8px;padding:10px 12px}
+  .it.t8 .c-no,.it.t8 .c-tp,.it.t8 .c-td{display:none}
+  .it.t8 .tdet{display:block}
+  .it.t8 .d1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
+}
 @container (max-width: 560px){
-  .lg{grid-template-columns:62px minmax(0,1fr) auto;gap:2px 10px}
+  .it.t8{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
+  .it.t8 .c-tgt{display:none}
+  .lg{grid-template-columns:62px minmax(0,1fr) auto auto;gap:2px 10px}
   .lg.head{display:none}
   .lg .c-batch,.lg .c-pal{display:none}
   .it{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
@@ -433,13 +452,18 @@ async function makeFirebaseDB() {
         if (!s.exists()) throw new Error('PL tidak ditemukan');
         var lk = s.data().lock;
         if (lk && lk.uid !== me.uid && toMs(lk.at) > Date.now() - CFG.lockTtlMs) return { ok: false, by: lk.id };
-        tx.update(plRef(pl), { lock: { uid: me.uid, id: me.id, at: F.serverTimestamp() }, status: 'busy' });
+        // status tetap; berubah jadi "busy" saat scan pertama (field status wajib ada menurut rules)
+        tx.update(plRef(pl), { lock: { uid: me.uid, id: me.id, at: F.serverTimestamp() }, status: s.data().status || 'open' });
         return { ok: true };
       });
     },
     heartbeat: function (pl) {
       return F.updateDoc(plRef(pl), { lock: { uid: me.uid, id: me.id, at: F.serverTimestamp() } });
     },
+    setStatus: function (pl, st) {
+      return F.updateDoc(plRef(pl), { lock: { uid: me.uid, id: me.id, at: F.serverTimestamp() }, status: st });
+    },
+    release: function (pl, st) { return F.updateDoc(plRef(pl), { lock: null, status: st || 'open' }); },
     forceUnlock: function (pl) { return F.updateDoc(plRef(pl), { lock: null, status: 'open' }); },
     loadEvents: async function (pl) {
       var qs = await F.getDocs(F.query(F.collection(db, 'picklists', pl, 'events'), F.orderBy('at')));
@@ -490,6 +514,7 @@ async function makeFirebaseDB() {
 /* ================= Util ================= */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function nf(n){return Number(n||0).toLocaleString('id-ID');}
+function ctnDec(pcs,pk){ if(!pk) return '-'; return (Math.round(pcs/pk*100)/100).toLocaleString('id-ID',{maximumFractionDigits:2})+' ctn'; }
 function fmtQ(pcs,pk){
   pcs=Math.max(0,Math.round(pcs||0));
   if(!pk) return nf(pcs)+' pcs';
@@ -547,16 +572,19 @@ function migrateLineRefs(pl,s){
   ensureKeys(pl);
   var keys={}, byNo={};
   pl.lines.forEach(function(l){keys[l._k]=1; (byNo[String(l.no)]=byNo[String(l.no)]||[]).push(l);});
+  function byCB(code,batch){ var B=String(batch||'').toUpperCase(); var m=pl.lines.filter(function(l){return l.code===code&&String(l.batch).toUpperCase()===B;})[0]; return m?m._k:null; }
   function map(old,code,batch){
     if(old==null||keys[old]) return old;
-    var c=byNo[String(old)]; if(!c||!c.length) return old;
+    var c=byNo[String(old)]; if(!c||!c.length) return (code&&byCB(code,batch))||old;
     if(c.length===1) return c[0]._k;
     var B=String(batch||'').toUpperCase();
     var m=c.filter(function(l){return l.code===code&&String(l.batch).toUpperCase()===B;})[0]||c.filter(function(l){return l.code===code;})[0];
     return m?m._k:old;
   }
   s.events.forEach(function(e){ if(e.line!=null) e.line=map(e.line,e.code,e.batch); });
-  var r2={}; Object.keys(s.reasons||{}).forEach(function(k){ var c=byNo[k]; r2[keys[k]?k:(c&&c.length===1?c[0]._k:k)]=s.reasons[k]; }); s.reasons=r2;
+  var r2={}; Object.keys(s.reasons||{}).forEach(function(k){ var c=byNo[k], nk=keys[k]?k:(c&&c.length===1?c[0]._k:null);
+    if(!nk){ var cb=k.split('_').slice(1).join('_'); var m=pl.lines.filter(function(l){return baseKey(l).split('_').slice(1).join('_')===cb;})[0]; nk=m?m._k:k; }
+    r2[nk]=s.reasons[k]; }); s.reasons=r2;
 }
 function undoneSet(s){var u={};s.events.forEach(function(e){if(e.res==='UNDO'&&e.ref)u[e.ref]=1;});return u;}
 function okEvents(s){var u=undoneSet(s);return s.events.filter(function(e){return e.res==='OK'&&!u[e.id];});}
@@ -565,23 +593,39 @@ function lineDone(pl){
   okEvents(s).forEach(function(e){ pcs[e.line]=(pcs[e.line]||0)+e.pcs; if(e.kind==='ctn') ctn[e.line]=(ctn[e.line]||0)+1; });
   return {pcs:pcs,ctn:ctn};
 }
+/**
+ * Item & karton dihitung per ItemCode (batch berbeda tetap baris terpisah untuk cek batch).
+ * Karton = floor(total pcs per ItemCode / isi karton): sisa dari beberapa batch yang pas
+ * 1 karton dihitung 1 karton (karton campuran).
+ */
+function itemAgg(lines,gotOf){
+  var g={}, order=[];
+  lines.forEach(function(l){ var c=String(l.code);
+    if(!g[c]){ g[c]={qty:0,got:0,pk:l.pk||0,done:true,perLine:0}; order.push(c); }
+    var x=g[c], got=gotOf?Math.min(gotOf(l)||0,l.qty):0;
+    x.qty+=l.qty; x.got+=got; if(!x.pk&&l.pk) x.pk=l.pk; if(got<l.qty) x.done=false;
+    if(l.pk) x.perLine+=Math.floor(l.qty/l.pk); });
+  var t={items:order.length,doneItems:0,ctnTgt:0,ctnGot:0,mixed:0};
+  order.forEach(function(c){var x=g[c]; if(x.done) t.doneItems++; if(x.pk){ t.ctnTgt+=Math.floor(x.qty/x.pk); t.ctnGot+=Math.floor(x.got/x.pk); if(x.got<x.qty) t.mixed+=Math.floor(x.qty/x.pk)-x.perLine; }});
+  return t;
+}
 function plStats(pl){
-  var d=lineDone(pl), t={lines:pl.lines.length,doneLines:0,tgtPcs:0,pcs:0,fullTgt:0,ctn:0,looseLines:0,rejected:0};
+  var d=lineDone(pl), t={lines:0,doneLines:0,rows:pl.lines.length,tgtPcs:0,pcs:0,fullTgt:0,ctn:0,looseLines:0,rejected:0};
   pl.lines.forEach(function(l){
     var got=d.pcs[lineKey(l)]||0;
     t.tgtPcs+=l.qty; t.pcs+=Math.min(got,l.qty);
-    if(l.pk){t.fullTgt+=Math.floor(l.qty/l.pk); if(l.qty%l.pk) t.looseLines++;}
-    if(got>=l.qty) t.doneLines++;
+    if(l.pk&&l.qty%l.pk) t.looseLines++;
   });
-  Object.keys(d.ctn).forEach(function(k){t.ctn+=d.ctn[k];});
-  sess(pl.pl).events.forEach(function(e){ if(['NOTIN','BATCH','OVER','REMAIN','FORMAT'].indexOf(e.res)>=0) t.rejected++; });
+  var a=itemAgg(pl.lines,function(l){return d.pcs[lineKey(l)]||0;});
+  t.lines=a.items; t.doneLines=a.doneItems; t.fullTgt=a.ctnTgt; t.ctn=a.ctnGot; t.mixedCtn=a.mixed;
+  t.rejected=rejectedOf(sess(pl.pl)).length;
   return t;
 }
 function lockActive(p){return p.lock&&p.lockAt>now()-CFG.lockTtlMs;}
 function plStatus(p){
   if(p.status==='done') return 'done';
   if(p.status==='diff') return 'diff';
-  if(p.status==='busy'||lockActive(p)) return 'busy';
+  if(p.status==='busy') return 'busy';
   return 'todo';
 }
 
@@ -680,8 +724,9 @@ function logEv(s,e){
   e.id=evId(); e.t=now(); e.by=(APP.me&&APP.me.id)||''; e.palet=s.palet; e.src=APP.input; e.res=e.res||'OK'; e.pcs=e.pcs||0;
   if(e.raw) e.raw=String(e.raw).slice(0,160);
   Object.keys(e).forEach(function(k){ if(e[k]===undefined) delete e[k]; });
-  if(!s.startedAt) s.startedAt=e.t;
+  if(!s.startedAt&&e.res!=='UNDO') s.startedAt=e.t;
   s.events.push(e); queueEv(e);
+  if(e.res!=='UNDO'){ var pl=plById(APP.pl); if(pl) syncBusy(pl); }
 }
 function setFb(f){APP.fb=f;}
 /** Tidak memblokir: tampilkan peringatan + bunyi, scan tetap bisa lanjut. */
@@ -689,12 +734,52 @@ function flag(f){APP.fb=f;beep(f.cls==='err'?'err':'warn');render();}
 function block(f){APP.blocked=true;f.blocking=true;APP.fb=f;beep(f.cls==='err'?'err':'warn');render();}
 function ack(){APP.blocked=null;APP.fb=null;render();focusScan();}
 function undo(){
-  var pl=plById(APP.pl),s=sess(pl.pl),oks=okEvents(s);
-  if(!oks.length){toast('Belum ada scan yang bisa dibatalkan.');return;}
-  var e=oks[oks.length-1];
-  logEv(s,{res:'UNDO',ref:e.id,line:e.line});
+  var pl=plById(APP.pl),s=sess(pl.pl),u=undoneSet(s);
+  var c=s.events.filter(function(e){return !u[e.id]&&(e.res==='OK'||REJ_NAME[e.res]);});
+  if(!c.length){toast('Belum ada scan yang bisa dibatalkan.');return;}
+  var e=c[c.length-1], l=pl.lines.filter(function(x){return lineKey(x)===e.line;})[0];
+  voidEvents(pl,s,[e],'Dibatalkan: '+(e.res==='OK'?(e.kind==='ctn'?'1 karton':nf(e.pcs)+' pcs'):'scan ditolak ('+(REJ_NAME[e.res]||e.res)+')')+' · '+(l?l.desc:(e.code||e.raw||'')));
+}
+/** Batalkan event (append UNDO, riwayat asli tetap ada di server). */
+function voidEvents(pl,s,list,msg){
+  if(!list.length){toast('Tidak ada yang perlu dihapus.');return;}
+  list.forEach(function(e){ logEv(s,{res:'UNDO',ref:e.id,line:e.line}); });
+  APP.fb=null; APP.confirm=null; syncBusy(pl); toast(msg); render(); focusScan();
+}
+/** Reset satu item: batalkan semua scan diterima & ditolak untuk baris itu. */
+function resetLine(k){
+  var pl=plById(APP.pl),s=sess(pl.pl),u=undoneSet(s), l=pl.lines.filter(function(x){return lineKey(x)===k;})[0];
+  var list=s.events.filter(function(e){return !u[e.id]&&e.line===k&&(e.res==='OK'||REJ_NAME[e.res]);});
+  if(APP.lastLine===k) APP.lastLine=null;
+  voidEvents(pl,s,list,'Item direset: '+(l?l.desc:k)+' ('+list.length+' scan dibatalkan)');
+}
+function voidStray(key){
+  var pl=plById(APP.pl),s=sess(pl.pl);
+  var list=rejectedOf(s).filter(function(e){return (e.res==='NOTIN'||e.res==='FORMAT')&&strayKey(e)===key;});
+  voidEvents(pl,s,list,list.length+' scan ditolak dihapus.');
+}
+function voidOne(id){
+  var pl=plById(APP.pl),s=sess(pl.pl),u=undoneSet(s);
+  var e=s.events.filter(function(x){return x.id===id&&!u[x.id];})[0]; if(!e) return;
   var l=pl.lines.filter(function(x){return lineKey(x)===e.line;})[0];
-  toast('Dibatalkan: '+(e.kind==='ctn'?'1 karton':nf(e.pcs)+' pcs')+' · '+(l?l.desc:e.code)); APP.fb=null; render();
+  voidEvents(pl,s,[e],(e.res==='OK'?'Scan dibatalkan':'Scan ditolak dihapus')+' · '+(l?l.desc:(e.code||e.raw||'')));
+}
+/** Tombol hapus/reset pakai 2 ketukan: ketuk 1 = "Yakin?", ketuk 2 (dalam 4 detik) = jalan. */
+function confirmTap(key,fn){
+  if(APP.confirm===key){ clearTimeout(APP.confirmT); APP.confirm=null; fn(); return; }
+  APP.confirm=key; clearTimeout(APP.confirmT); APP.confirmT=setTimeout(function(){ if(APP.confirm===key){APP.confirm=null; render(); focusScan();} },4000);
+  render(); focusScan();
+}
+function cBtn(key,label,aria){var on=APP.confirm===key;
+  return '<button type="button" class="rbtn'+(on?' on':'')+'" data-cf="'+esc(key)+'" aria-label="'+esc(on?'Ketuk lagi untuk '+aria:aria)+'">'+(on?'Yakin?':label)+'</button>';}
+/** Status "Sedang dicek" hanya bila sudah ada scan aktif (diterima/ditolak). */
+function syncBusy(pl){
+  var s=sess(pl.pl), active=okEvents(s).length+rejectedOf(s).length>0, cur=pl.status||'open', want=null;
+  if(active&&cur!=='busy') want='busy';
+  else if(!active&&cur==='busy') want='open';
+  if(!want||s.submitted) return;
+  pl.status=want;
+  if(DB.setStatus) DB.setStatus(pl.pl,want).catch(function(e){ console.warn('setStatus',e); });
 }
 
 /* ================= Ecer / karton campuran ================= */
@@ -857,14 +942,14 @@ function vList(){
   h+='<div class="cards">';
   if(!rows.length) h+='<div class="card muted" style="padding:24px 18px">'+(APP.pls.length?'Tidak ada picking list di filter ini.':'Belum ada picking list. Data dikirim dari Sheet oleh GAS.')+'</div>';
   rows.forEach(function(p){
-    var full=0,loose=0; (p.lines||[]).forEach(function(l){ if(l.pk){full+=Math.floor(l.qty/l.pk); if(l.qty%l.pk) loose++;} });
+    var ag=itemAgg(p.lines||[]), full=ag.ctnTgt, loose=0; (p.lines||[]).forEach(function(l){ if(l.pk&&l.qty%l.pk) loose++; });
     var status=plStatus(p), mine=p.lock&&APP.me&&p.lock.uid===APP.me.uid;
-    var who=status==='busy'?(lockActive(p)?('Dicek '+(mine?'Anda':(p.lock.id||''))):'Kunci lepas'):'';
+    var who=status==='busy'?(lockActive(p)?('Dicek '+(mine?'Anda':(p.lock.id||''))):'Kunci lepas'):(lockActive(p)&&(status==='todo')?('Dibuka '+(mine?'Anda':(p.lock.id||''))):'');
     h+='<div class="plwrap"><button type="button" class="plcard" data-pl="'+esc(p.pl)+'">'+
       '<div class="c-pl"><div class="pl-top">'+stChip(status)+'<span class="plno">PL '+esc(p.pl)+'</span>'+sapChip(p)+'</div>'+
         '<div class="meta"><span>'+IC2.cal+esc(p.date||'-')+'</span><span>'+IC2.user+'Picker '+esc(p.picker||'-')+'</span>'+(who?'<span class="who-l">'+esc(who)+'</span>':'')+'</div></div>'+
       '<div class="c-cust col"><span class="lab">Customer</span><span class="val ell">'+esc(p.cust)+'</span><span class="sub ell">OR '+esc((p.ors||[]).join(' · '))+'</span></div>'+
-      '<div class="c-lines col r"><span class="lab">Item</span><span class="val">'+(p.lines||[]).length+'</span></div>'+
+      '<div class="c-lines col r"><span class="lab">Item</span><span class="val">'+ag.items+'</span></div>'+
       '<div class="c-full col r"><span class="lab">Karton</span><span class="val">'+nf(full)+'</span></div>'+
       '<div class="c-loose col r"><span class="lab">Ecer</span><span class="val">'+(loose?loose+' item':'-')+'</span></div>'+
       '<span class="c-go">'+IC2.chev+'</span>'+
@@ -914,7 +999,7 @@ function vScan(){
       '<div class="btn2"><button type="button" class="btn" id="bUndo">Batalkan scan</button><button type="button" class="btn" id="bEcer">Input ecer</button></div>'+
       '<button type="button" class="btn pri block monly" id="bSum2" style="margin-top:10px;height:52px">Selesai &amp; ringkasan</button></div>'+
     '<div class="card pad mhide"><div class="ctitle">Checker</div><div class="who">'+avatar(u.id)+'<div><div style="font-weight:500">'+esc(u.name||u.id||'')+'</div><div class="muted" style="font-size:12px">'+esc(u.id||'')+'</div></div></div></div>'+
-    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Status SAP',sapLabel(pl.sap)||'-')+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Item',String(pl.lines.length))+'</div>'+
+    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Status SAP',sapLabel(pl.sap)||'-')+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Item',String(itemAgg(pl.lines).items)+(itemAgg(pl.lines).items!==pl.lines.length?' ('+pl.lines.length+' baris batch)':''))+'</div>'+
     '<div class="card pad mhide"><div class="ctitle">Customer</div><div style="font-weight:500;margin-bottom:4px">'+esc(pl.cust)+'</div><div class="muted" style="font-size:12px">'+esc(pl.rem)+'</div></div>'+
   '</aside>';
 
@@ -959,7 +1044,7 @@ function vScan(){
   } else if(f==='pal'){
     h+=paletView(pl,s);
   } else {
-    h+='<div class="it head"><span class="c-no">No</span><span>Item</span><span class="c-batch">Batch</span><span class="r c-tgt">Target</span><span class="r c-done">Dicek</span><span class="c-st">Status</span></div>';
+    h+='<div class="it t8 head"><span class="c-no">No</span><span>Item</span><span class="c-batch">Batch</span><span class="r c-tgt">Ctn + Pcs</span><span class="r c-tp">Total pcs</span><span class="r c-td">Ctn</span><span class="r c-done">Dicek</span><span class="c-st">Status</span></div>';
     var tags={done:['chip-g','Lengkap'],ecer:['chip-w','Perlu ecer'],part:['chip-b','Sebagian'],todo:['chip-n','Belum']};
     var lastG=null, gc={prog:0,err:0,todo:0,done:0};
     shown.forEach(function(r){gc[dg(r)]++;});
@@ -968,9 +1053,9 @@ function vScan(){
     function putExtra(){ if(extraDone) return; extraDone=true; if(!extra.length) return;
       if(f==='all'&&lastG!=='err'){ h+='<div class="it-grp g-err">'+GNAME.err+'<span>'+gc.err+'</span></div>'; lastG='err'; }
       extra.forEach(function(x){
-        h+='<div class="it bad"><span class="c-no muted">-</span><div style="min-width:0"><div class="d1 ell">'+esc(x.title)+'</div><div class="d2">'+esc(x.code||x.raw)+'</div>'+
-          '<div class="d3">'+x.n+' scan · '+esc(x.hint)+'</div></div><span class="c-batch mono" style="font-size:13px">'+esc(x.batch||'-')+'</span><span class="r c-tgt" style="font-size:13px">-</span>'+
-          '<span class="r c-done" style="font-size:13px;font-weight:500">'+x.n+' scan</span><span class="c-st"><span class="chip chip-r">'+esc(x.chip)+'</span></span></div>';
+        h+='<div class="it t8 bad"><span class="c-no muted">-</span><div style="min-width:0"><div class="d1 ell">'+esc(x.title)+'</div><div class="d2">'+esc(x.code||x.raw)+'</div>'+
+          '<div class="d3">'+x.n+' scan · '+esc(x.hint)+'</div></div><span class="c-batch mono" style="font-size:13px">'+esc(x.batch||'-')+'</span><span class="r c-tgt" style="font-size:13px">-</span><span class="r c-tp">-</span><span class="r c-td">-</span>'+
+          '<span class="r c-done" style="font-size:13px;font-weight:500">'+x.n+' scan</span><span class="c-st"><span class="chip chip-r">'+esc(x.chip)+'</span>'+cBtn('S:'+x.key,'Hapus','hapus scan ditolak '+x.title)+'</span></div>';
       });
     }
     shown.forEach(function(r){var l=r.l;
@@ -978,12 +1063,16 @@ function vScan(){
       if(f==='err'||(f==='all'&&GRP[dg(r)]>GRP.err)) putExtra();
       if(f==='all'&&g!==lastG){ h+='<div class="it-grp g-'+g+'">'+GNAME[g]+'<span>'+gc[g]+'</span></div>'; lastG=g; }
       var tag=r.stt!=='done'&&r.err?['chip-r','Salah']:tags[r.stt];
-      h+='<div class="it'+(r.k===APP.lastLine?' flash':'')+(r.stt!=='done'&&r.err?' bad':'')+'"><span class="c-no muted">'+l.no+'</span>'+
+      h+='<div class="it t8'+(r.k===APP.lastLine?' flash':'')+(r.stt!=='done'&&r.err?' bad':'')+'"><span class="c-no muted">'+l.no+'</span>'+
         '<div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+((pl.ors||[]).length>1?' · OR '+esc(l.or):'')+
-'</div>'+
+'</div>'+(l.nos&&l.nos.length>1?'<div class="dg">Gabungan No '+esc(l.nos.join(', '))+'</div>':'')+
+        '<div class="tdet">Total '+nf(l.qty)+' pcs · '+ctnDec(l.qty,l.pk)+'</div>'+
         (r.err?'<div class="d3">'+r.err+' scan ditolak · lihat tab Ditolak</div>':'')+'</div>'+
         '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span>'+
-        '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'<span class="c-of"> / '+fmtQ(l.qty,l.pk)+'</span></span><span class="c-st"><span class="chip '+tag[0]+'">'+tag[1]+'</span></span></div>';
+        '<span class="r c-tp" style="font-size:13px">'+nf(l.qty)+'</span><span class="r c-td" style="font-size:13px">'+(l.pk?ctnDec(l.qty,l.pk).replace(' ctn',''):'-')+'</span>'+
+        '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'<span class="c-of"> / '+fmtQ(l.qty,l.pk)+'</span>'+
+        (r.got&&l.pk?'<small class="dpcs">'+nf(r.got)+' pcs</small>':'')+'</span><span class="c-st"><span class="chip '+tag[0]+'">'+tag[1]+'</span>'+
+        ((r.got||r.err)&&!sess(pl.pl).submitted?cBtn('L:'+r.k,'Reset','reset item '+l.desc):'')+'</span></div>';
     });
     putExtra();
     if(!shown.length&&!(extra.length&&(f==='all'||f==='err'))) h+='<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada item yang cocok dengan pencarian.':'Tidak ada item di filter ini.')+'</div>';
@@ -1012,7 +1101,7 @@ function vSum(){
   h+='<div class="sum-grid"><div style="display:flex;flex-direction:column;gap:14px">';
   h+='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'+
     '<div class="card kpi"><span class="l">Item lengkap</span><span class="v">'+st.doneLines+'<small> / '+st.lines+'</small></span></div>'+
-    (function(){var c=ctnState(st); return '<div class="card kpi kc-'+c.cls+'"><span class="l">Karton penuh</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span><span class="ks">'+esc(c.short)+'</span></div>';})()+
+    (function(){var c=ctnState(st); return '<div class="card kpi kc-'+c.cls+'"><span class="l">Karton</span><span class="v">'+nf(st.ctn)+'<small> / '+nf(st.fullTgt)+'</small></span><span class="ks">'+esc(c.short)+'</span></div>';})()+
     '<div class="card kpi"><span class="l">Pcs</span><span class="v">'+nf(st.pcs)+'<small> / '+nf(st.tgtPcs)+'</small></span></div>'+
     '<div class="card kpi" style="'+(st.tgtPcs-st.pcs?'background:var(--err-soft);border-color:var(--err-line)':'')+'"><span class="l">Selisih</span><span class="v" style="color:'+(st.tgtPcs-st.pcs?'var(--err)':'var(--ok)')+'">'+(st.tgtPcs-st.pcs?'-'+nf(st.tgtPcs-st.pcs)+' pcs':'0')+'</span></div></div>';
   h+='<section class="card ctable"><h2 class="sec-t">Item dengan selisih · '+diffs.length+'</h2>';
@@ -1109,11 +1198,11 @@ function vModal(){
 
 var REASONS=['Kurang pick - kembalikan ke picker','Stok fisik tidak ada','Karton rusak','Lainnya'];
 var REJ_NAME={NOTIN:'Item tidak ada di PL',BATCH:'Batch tidak sesuai',OVER:'Melebihi target',REMAIN:'Sisa ecer (karton penuh ditolak)',FORMAT:'Barcode tidak dikenali'};
-function rejectedOf(s){return s.events.filter(function(e){return REJ_NAME[e.res];});}
+function rejectedOf(s){var u=undoneSet(s);return s.events.filter(function(e){return REJ_NAME[e.res]&&!u[e.id];});}
 /** Jumlah scan salah per item: batch salah & melebihi target. (Sisa ecer bukan salah.) */
 function lineErrors(pl,s){
   var out={};
-  s.events.forEach(function(e){
+  rejectedOf(s).forEach(function(e){
     if(e.res!=='BATCH'&&e.res!=='OVER') return;
     var k=e.line;
     if(!k&&e.code){ var l=pl.lines.filter(function(x){return x.code===e.code;})[0]; if(l) k=lineKey(l); }
@@ -1128,14 +1217,15 @@ function iqMatch(parts){
   return q.split(/\s+/).every(function(w){return hay.indexOf(w)>=0;});
 }
 /** Scan ditolak yang kartonnya harus dipisahkan secara fisik (sisa ecer tidak termasuk). */
-function sepRejects(s){return s.events.filter(function(e){return ['BATCH','OVER','NOTIN','FORMAT'].indexOf(e.res)>=0;});}
+function sepRejects(s){return rejectedOf(s).filter(function(e){return ['BATCH','OVER','NOTIN','FORMAT'].indexOf(e.res)>=0;});}
 /** Scan ditolak yang tidak menempel ke item PL: item tidak ada di PL & barcode tidak dikenali. */
+function strayKey(e){return e.res+'|'+(e.res==='NOTIN'?(e.code+'|'+e.batch):(e.raw||''));}
 function strayRejects(s){
   var m={}, out=[];
-  s.events.forEach(function(e){
+  rejectedOf(s).forEach(function(e){
     if(e.res!=='NOTIN'&&e.res!=='FORMAT') return;
-    var key=e.res+'|'+(e.res==='NOTIN'?(e.code+'|'+e.batch):(e.raw||''));
-    if(!m[key]){ m[key]={n:0,code:e.code||'',batch:e.batch||'',raw:(e.raw||'').slice(0,60),
+    var key=strayKey(e);
+    if(!m[key]){ m[key]={key:key,n:0,code:e.code||'',batch:e.batch||'',raw:(e.raw||'').slice(0,60),
       title:e.res==='NOTIN'?'Item tidak ada di PL ini':'Barcode tidak dikenali',
       chip:e.res==='NOTIN'?'Tidak di PL':'Barcode rusak',
       hint:e.res==='NOTIN'?'pisahkan, kembalikan ke picker':'cek label karton'}; out.push(m[key]); }
@@ -1180,9 +1270,10 @@ function paletView(pl,s){
 /** Keterangan: karton penuh yang discan vs total karton penuh di PL. */
 function ctnState(st){
   if(!st.fullTgt) return {cls:'n',short:'Tidak ada karton penuh',text:'PL ini tidak punya karton penuh (semua ecer).'};
-  if(st.ctn===st.fullTgt) return {cls:'ok',short:'Sesuai',text:'Karton penuh sesuai: '+nf(st.ctn)+' / '+nf(st.fullTgt)+' ctn'};
-  if(st.ctn<st.fullTgt) return {cls:'warn',short:'Kurang '+nf(st.fullTgt-st.ctn)+' ctn',text:'Karton penuh belum sesuai: kurang '+nf(st.fullTgt-st.ctn)+' ctn ('+nf(st.ctn)+' / '+nf(st.fullTgt)+')'};
-  return {cls:'err',short:'Lebih '+nf(st.ctn-st.fullTgt)+' ctn',text:'Karton penuh lebih '+nf(st.ctn-st.fullTgt)+' ctn ('+nf(st.ctn)+' / '+nf(st.fullTgt)+')'};
+  if(st.ctn===st.fullTgt) return {cls:'ok',short:'Sesuai',text:'Karton sesuai: '+nf(st.ctn)+' / '+nf(st.fullTgt)+' ctn'};
+  if(st.ctn<st.fullTgt) return {cls:'warn',short:'Kurang '+nf(st.fullTgt-st.ctn)+' ctn',text:'Karton belum sesuai: kurang '+nf(st.fullTgt-st.ctn)+' ctn ('+nf(st.ctn)+' / '+nf(st.fullTgt)+')'+
+    (st.mixedCtn?' · termasuk '+nf(st.mixedCtn)+' karton campuran beda batch, dihitung setelah sisanya diisi lewat Input ecer':'')};
+  return {cls:'err',short:'Lebih '+nf(st.ctn-st.fullTgt)+' ctn',text:'Karton lebih '+nf(st.ctn-st.fullTgt)+' ctn ('+nf(st.ctn)+' / '+nf(st.fullTgt)+')'};
 }
 function ctnNote(st){var c=ctnState(st); return '<div class="ctnnote c-'+c.cls+'" role="status"><i aria-hidden="true"></i><span>'+esc(c.text)+'</span></div>';}
 function kpiBtn(f,label,val,aria){
@@ -1194,7 +1285,7 @@ function scanLog(pl,s,f){
   var byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
   if(APP.iq) list=list.filter(function(e){var l=byK[e.line]; return iqMatch([l?l.desc:'',e.code,e.batch,e.raw,l?'#'+l.no:'']);});
   if(!list.length) return '<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada scan yang cocok dengan pencarian.':f==='log'?'Belum ada scan diterima.':'Tidak ada scan yang ditolak.')+'</div>';
-  h+='<div class="lg head"><span>Jam</span><span>Item</span><span class="c-batch">Batch</span><span class="r">'+(f==='log'?'Jumlah':'Hasil')+'</span><span class="c-pal">'+(f==='log'?'Palet':'Oleh')+'</span></div>';
+  h+='<div class="lg head"><span>Jam</span><span>Item</span><span class="c-batch">Batch</span><span class="r">'+(f==='log'?'Jumlah':'Hasil')+'</span><span class="c-pal">'+(f==='log'?'Palet':'Oleh')+'</span><span></span></div>';
   list.slice(-300).reverse().forEach(function(e){
     var l=byK[e.line];
     var nm=l?l.desc:(e.code||e.raw||'');
@@ -1202,7 +1293,7 @@ function scanLog(pl,s,f){
     if(!l&&e.res==='FORMAT') nm=String(e.raw||'').slice(0,60);
     var q=f==='log'?(e.kind==='ctn'?'+1 ctn':'+'+nf(e.pcs)+' pcs'):'<span class="chip '+(e.res==='REMAIN'?'chip-w':'chip-r')+'">'+esc(REJ_NAME[e.res]||e.res)+'</span>';
     h+='<div class="lg"><span class="muted">'+hhmm(e.t)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(nm)+'</div><div class="d2">'+esc(sub)+'</div></div>'+
-      '<span class="c-batch mono" style="font-size:13px">'+esc(e.batch||'-')+'</span><span class="r" style="font-size:13px;font-weight:500">'+q+'</span><span class="c-pal muted" style="font-size:12px">'+esc(f==='log'?('P'+(e.palet||1)):(e.by||''))+'</span></div>';
+      '<span class="c-batch mono" style="font-size:13px">'+esc(e.batch||'-')+'</span><span class="r" style="font-size:13px;font-weight:500">'+q+'</span><span class="c-pal muted" style="font-size:12px">'+esc(f==='log'?('P'+(e.palet||1)):(e.by||''))+'</span><span class="c-act">'+(sess(pl.pl).submitted?'':cBtn('E:'+e.id,'Hapus',(f==='log'?'batalkan scan ':'hapus scan ditolak ')+nm))+'</span></div>';
   });
   if(list.length>300) h+='<div style="padding:10px 14px" class="muted">Menampilkan 300 terakhir dari '+list.length+'.</div>';
   return h;
@@ -1221,6 +1312,7 @@ async function openPl(id){
   var evs=[];
   try{ evs=await DB.loadEvents(id); }catch(e){ toast('Gagal memuat log scan: '+(e.code||e.message)); }
   var s=sess(id); s.events=evs; s.submitted=false; migrateLineRefs(p,s);
+  syncBusy(p);   // rapikan status lama: "Sedang dicek" tanpa scan aktif -> Belum dicek
   s.startedAt=evs.length?evs[0].t:null;
   s.palet=evs.reduce(function(m,e){return Math.max(m,e.palet||1);},1); s.palCount=Math.max(s.palCount||1,s.palet);
   APP.pl=id; APP.view='scan'; APP.itemFilter='all'; APP.palView='all'; APP.iq=''; APP.iqFocus=false; APP.fb=null; APP.blocked=null; APP.lastLine=null; APP.lastRaw=''; APP.plChanged=false; APP.plHash=p.hash||null;
@@ -1232,6 +1324,11 @@ async function openPl(id){
   render(); window.scrollTo(0,0);
 }
 function leavePl(){
+  var pl=APP.pl&&plById(APP.pl), s=pl&&sess(pl.pl);
+  if(pl&&s&&!s.submitted&&!okEvents(s).length&&!rejectedOf(s).length&&DB.release){
+    var st=(pl.status==='busy')?'open':(pl.status||'open');
+    DB.release(pl.pl,st).catch(function(e){ console.warn('release',e); });
+  }
   flush(); camStop(); stopHeartbeat();
   if(APP.unsubPl){APP.unsubPl();APP.unsubPl=null;}
   APP.view='list'; APP.fb=null; APP.blocked=null; APP.pl=null; render();
@@ -1245,7 +1342,8 @@ function buildResult(pl){
     cust:pl.cust||'',ors:pl.ors||[],sap:pl.sap||'',tgtCtn:stt.fullTgt,ctnTotal:stt.ctn,scanners:Object.keys(scanners),tgtPcs:stt.tgtPcs,pcsTotal:stt.pcs,
     diffLines:pl.lines.filter(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;}).length,rejectedCount:stt.rejected,
     rejSeparated:sepN?(s.rejOkCount===sepN):null,rejSeparatedCount:sepN,
-    lines:pl.lines.map(function(l){var k=lineKey(l);return {no:l.no,or:l.or||'',code:l.code,desc:l.desc||'',batch:l.batch,qty:l.qty,pk:l.pk||0,pcs:d.pcs[k]||0,ctn:d.ctn[k]||0,reason:(d.pcs[k]||0)!==l.qty?(s.reasons[k]||''):''};}),
+    lines:pl.lines.map(function(l){var k=lineKey(l);return {no:l.no,nos:l.nos||null,or:l.or||'',code:l.code,desc:l.desc||'',batch:l.batch,qty:l.qty,pk:l.pk||0,pcs:d.pcs[k]||0,ctn:d.ctn[k]||0,reason:(d.pcs[k]||0)!==l.qty?(s.reasons[k]||''):''};}),
+    voidedCount:s.events.filter(function(e){return e.res==='UNDO';}).length,
     rejected:rejectedOf(s).slice(-300).map(function(e){return {t:e.t,code:e.code||'',batch:e.batch||'',res:e.res,raw:(e.raw||'').slice(0,160),by:e.by||''};}),
     checkerId:(APP.me&&APP.me.id)||''};
 }
@@ -1333,10 +1431,12 @@ function resultsWorkbook(list){
     lines.forEach(function(l){ var q=Number(l.qty)||0, p=Number(l.pcs)||0, pk=Number(l.pk)||(byNo[l.no]&&byNo[l.no].pk)||0;
       tgt+=q; got+=Math.min(p,q); if(p!==q) diff++; ctn+=Number(l.ctn)||0; if(!hasTgtCtn&&pk) tgtCtn+=Math.floor(q/pk);
       det.push([r.pl,l.or||'',l.no,l.code,l.desc||(byNo[l.no]&&byNo[l.no].desc)||'',l.batch,q,p,Number(l.ctn)||0,p-q,p===q?'Sesuai':(p<q?'Kurang':'Lebih'),l.reason||'',ST_NAME[r.status]||r.status||'']); });
+    var agx=itemAgg(lines.map(function(l){return {code:l.code,qty:Number(l.qty)||0,pk:Number(l.pk)||(byNo[l.no]&&byNo[l.no].pk)||0};}));
+    if(!hasTgtCtn) tgtCtn=agx.ctnTgt;
     var tc=hasTgtCtn?Number(r.tgtCtn):(tgtCtn||''), cd=(r.ctnTotal!==undefined&&r.ctnTotal!==null)?Number(r.ctnTotal):ctn;
     var dur=(r.startedAt&&r.finishedAt)?Math.round((r.finishedAt-r.startedAt)/60000):'';
     sum.push([r.pl,(r.ors||[]).join(', '),r.cust||(live&&live.cust)||'',sapLabel(r.sap||(live&&live.sap)),ST_NAME[r.status]||r.status||'',r.startedAt||'',r.finishedAt||'',dur,r.checkerId||'',(r.scanners||[]).join(', '),
-      lines.length,diff,tgt,got,got-tgt,tc,cd,ctnKet(tc,cd),(r.rejectedCount!=null?r.rejectedCount:(r.rejected||[]).length),r.rejSeparated===true?'Ya':r.rejSeparated===false?'Belum':'']);
+      agx.items,diff,tgt,got,got-tgt,tc,cd,ctnKet(tc,cd),(r.rejectedCount!=null?r.rejectedCount:(r.rejected||[]).length),r.rejSeparated===true?'Ya':r.rejSeparated===false?'Belum':'']);
     (r.rejected||[]).forEach(function(x){ rej.push([r.pl,x.t||'',x.code||'',x.batch||'',REJ_NAME[x.res]||x.res||'',x.raw||'',x.by||r.checkerId||'']); });
   });
   return XL.build([
@@ -1454,6 +1554,9 @@ function bind(){
       });
     }
     on('bIqX','click',function(){ APP.iq=''; APP.iqFocus=false; render(); focusScan(); });
+    each('[data-cf]',function(b){b.addEventListener('click',function(){var key=b.getAttribute('data-cf');
+      confirmTap(key,function(){ var t=key.slice(0,2), v=key.slice(2);
+        if(t==='L:') resetLine(v); else if(t==='S:') voidStray(v); else if(t==='E:') voidOne(v); });});});
     each('[data-kf]',function(b){b.addEventListener('click',function(){var f=b.getAttribute('data-kf'); APP.itemFilter=APP.itemFilter===f?'all':f; render();
       var sec=$('#itemsSec'); if(sec&&sec.scrollIntoView) sec.scrollIntoView({behavior:'smooth',block:'start'}); focusScan();});});
     if(APP.input==='camera'&&!APP.cam) camStart();
