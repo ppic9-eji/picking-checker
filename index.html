@@ -114,6 +114,8 @@ button{cursor:pointer}
 .it .d3{font-size:12px;color:var(--err);font-weight:500}
 .it.t8{grid-template-columns:36px minmax(150px,1fr) 96px 104px 76px 64px 112px 136px;gap:10px}
 .it .tdet{display:none;font-size:12px;color:var(--muted)}
+/* No item: kolom sendiri di layar lebar/menengah, teks kecil "No 33 ·" di layar sempit */
+.mno{display:none}
 .it .c-tp,.it .c-td{color:var(--ink)}
 .it .dpcs{display:block;font-size:11px;font-weight:400;color:var(--muted)}
 .it.t8 .d1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
@@ -126,6 +128,12 @@ button{cursor:pointer}
 .pal[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:#fff}.pal[aria-pressed="true"] small{color:#DCE7FF}
 .pal.add{border-style:dashed;color:var(--pri);font-size:16px}
 .pal.sm{flex-direction:row;height:34px;min-width:0;font-size:13px}
+.pal .palr{font-size:10px;color:var(--err);line-height:1}
+.pal[aria-pressed="true"] .palr{color:#FFE1E1}
+.pal{height:auto;min-height:48px;padding:4px 8px}
+.lg.rg{grid-template-columns:96px minmax(160px,1fr) 100px 150px 90px 72px}
+.lg .mres{display:none;color:var(--err);font-weight:500}
+.lg .dpcs{display:block;font-size:11px;font-weight:400;color:var(--muted)}
 .chip.sap{background:#fff;border:1px solid var(--line);color:var(--ink);gap:6px;padding:0 8px 0 4px;font-weight:400}
 .chip.sap .sap-k{font-size:10px;font-weight:500;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#EEF2F8;color:var(--muted)}
 .chip.sap-r .sap-k{background:var(--pri-soft);color:var(--pri)}
@@ -221,19 +229,27 @@ textarea.out{width:100%;min-height:140px;border:1px solid var(--line);border-rad
   .it .d1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
   .srow{grid-template-columns:minmax(140px,1fr) 92px 100px 92px 84px;gap:8px;padding:10px 12px}
   .srow .c-no{display:none}
+  .it:not(.t8) .mno,.srow .mno{display:inline}
 }
 @container (max-width: 880px){
-  .it.t8{grid-template-columns:minmax(120px,1fr) 86px 100px 104px 120px;gap:8px;padding:10px 12px}
-  .it.t8 .c-no,.it.t8 .c-tp,.it.t8 .c-td{display:none}
+  /* No tetap kolom sendiri; Total pcs & Ctn pindah ke baris kecil di bawah nama (tanpa geser ke samping) */
+  .it.t8{grid-template-columns:30px minmax(110px,1fr) 84px 100px 104px 120px;gap:8px;padding:10px}
+  .it.t8 .c-no{display:block}
+  .it.t8 .c-tp,.it.t8 .c-td{display:none}
   .it.t8 .tdet{display:block}
   .it.t8 .d1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
 }
 @container (max-width: 560px){
   .it.t8{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
-  .it.t8 .c-tgt{display:none}
+  .it.t8 .c-tgt,.it.t8 .c-no,.it.t8 .c-tp,.it.t8 .c-td{display:none}
+  .it .mno,.srow .mno{display:inline}
+  .it.t8 .tdet{display:block}
   .lg{grid-template-columns:62px minmax(0,1fr) auto auto;gap:2px 10px}
   .lg.head{display:none}
   .lg .c-batch,.lg .c-pal{display:none}
+  .lg.rg{grid-template-columns:76px minmax(0,1fr) auto auto}
+  .lg.rg > span:nth-child(4){display:none}
+  .lg .mres{display:inline}
   .it{grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px}
   .it.head{display:none}
   .it .c-tgt{display:none}
@@ -1066,7 +1082,7 @@ function vScan(){
       h+='<div class="it t8'+(r.k===APP.lastLine?' flash':'')+(r.stt!=='done'&&r.err?' bad':'')+'"><span class="c-no muted">'+l.no+'</span>'+
         '<div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+((pl.ors||[]).length>1?' · OR '+esc(l.or):'')+
 '</div>'+(l.nos&&l.nos.length>1?'<div class="dg">Gabungan No '+esc(l.nos.join(', '))+'</div>':'')+
-        '<div class="tdet">Total '+nf(l.qty)+' pcs · '+ctnDec(l.qty,l.pk)+'</div>'+
+        '<div class="tdet"><span class="mno">No '+esc(l.no)+' · </span>Total '+nf(l.qty)+' pcs · '+ctnDec(l.qty,l.pk)+'</div>'+
         (r.err?'<div class="d3">'+r.err+' scan ditolak · lihat tab Ditolak</div>':'')+'</div>'+
         '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span>'+
         '<span class="r c-tp" style="font-size:13px">'+nf(l.qty)+'</span><span class="r c-td" style="font-size:13px">'+(l.pk?ctnDec(l.qty,l.pk).replace(' ctn',''):'-')+'</span>'+
@@ -1094,7 +1110,7 @@ function vSum(){
   var pl=plById(APP.pl), s=sess(pl.pl), st=plStats(pl), d=lineDone(pl);
   var diffs=pl.lines.filter(function(l){return (d.pcs[lineKey(l)]||0)!==l.qty;});
   var rej=rejectedOf(s);
-  var pal={}; okEvents(s).forEach(function(e){pal[e.palet]=pal[e.palet]||{c:0,p:0}; if(e.kind==='ctn')pal[e.palet].c++; pal[e.palet].p+=e.pcs;});
+  var pal=palStats(s);
   var stNow=s.submitted?(diffs.length?'diff':'done'):'busy';
   var top=topbar('<div class="crumb tb"><button type="button" class="link" id="bToListC">Picking List</button><span>/</span><button type="button" class="link" id="bBackScan">PL '+esc(pl.pl)+'</button><span>/</span><b>Ringkasan</b></div>');
   var h='<div class="doc-head"><div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1>Ringkasan PL '+esc(pl.pl)+'</h1>'+stChip(stNow)+sapChip(pl)+'</div><div class="muted ell">'+esc(pl.cust)+' · OR '+esc((pl.ors||[]).join(' · '))+'</div></div></div>';
@@ -1109,7 +1125,7 @@ function vSum(){
   else{
     h+='<div class="srow head"><span class="c-no">No</span><span>Item</span><span>Batch</span><span class="r c-tgt">Target</span><span class="r">Dicek</span><span class="r">Selisih</span></div>';
     diffs.forEach(function(l){var k=lineKey(l),got=d.pcs[k]||0;
-      h+='<div class="srow"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="ell" style="font-weight:500;font-size:13px">'+esc(l.desc)+'</div><div class="muted" style="font-size:12px">'+esc(l.code)+'</div>'+
+      h+='<div class="srow"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="ell" style="font-weight:500;font-size:13px">'+esc(l.desc)+'</div><div class="muted" style="font-size:12px"><span class="mno">No '+esc(l.no)+' · </span>'+esc(l.code)+'</div>'+
       '<label class="sr" for="rs'+k+'">Alasan item '+l.no+'</label><select id="rs'+k+'" data-rk="'+k+'" class="inp" style="height:40px;margin-top:6px;font-size:13px;max-width:320px"'+(s.submitted?' disabled':'')+'><option value="">Pilih alasan (wajib)</option>'+REASONS.map(function(r){return '<option'+(s.reasons[k]===r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select></div>'+
       '<span class="mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span><span class="r" style="font-size:13px">'+fmtQ(got,l.pk)+'</span><span class="r" style="color:var(--err);font-weight:500;font-size:13px">-'+nf(l.qty-got)+' pcs</span></div>';});
   }
@@ -1125,7 +1141,7 @@ function vSum(){
     kv('Checker',(APP.me||{}).id||'-')+kv('Picker',pl.picker)+kv('Mulai',s.startedAt?hhmm(s.startedAt):'-')+kv('Scan diterima',String(okEvents(s).length))+'</div>';
   h+='<div class="card pad"><div class="ctitle">Per palet</div>';
   var pk=Object.keys(pal); if(!pk.length) h+='<span class="muted">Belum ada.</span>';
-  pk.forEach(function(p){h+=kv('Palet '+p,nf(pal[p].c)+' ctn · '+nf(pal[p].p)+' pcs');});
+  pk.forEach(function(p){var x=pal[p]; h+=kv('Palet '+p,nf(x.c+x.r)+' ctn'+(x.r?' ('+nf(x.r)+' ditolak)':'')+' · '+nf(x.p+x.rp)+' pcs');});
   h+='</div>';
   if(!s.submitted){
     if(diffs.length) h+='<div class="note">PL dengan selisih masuk status "Ada selisih" dan perlu persetujuan admin.</div>';
@@ -1233,14 +1249,19 @@ function strayRejects(s){
   });
   return out;
 }
+/** Isi karton dari barcode (field ke-4) untuk scan yang ditolak. */
+function rejPer(e){ var b=parseBarcode(e.raw||''); return (b&&b.ok&&b.per)||0; }
+/** Per palet: c = karton diterima, r = karton ditolak (tetap ada fisik di palet), p = pcs diterima, rp = pcs ditolak. */
 function palStats(s){
-  var p={}; okEvents(s).forEach(function(e){var n=e.palet||1; p[n]=p[n]||{c:0,p:0}; if(e.kind==='ctn')p[n].c++; p[n].p+=e.pcs;});
+  var p={}; function g(n){return p[n]=p[n]||{c:0,p:0,r:0,rp:0};}
+  okEvents(s).forEach(function(e){var x=g(e.palet||1); if(e.kind==='ctn')x.c++; x.p+=e.pcs;});
+  rejectedOf(s).forEach(function(e){ if(e.res==='REMAIN') return; var x=g(e.palet||1); x.r++; x.rp+=rejPer(e); });
   return p;
 }
 function palRow(s){
   var n=Math.max(s.palCount||1,s.palet), ps=palStats(s), h='<div class="palrow2"><div class="ctitle" style="margin:0">Palet aktif</div><div class="pals" role="group" aria-label="Pilih palet aktif">';
-  for(var i=1;i<=n;i++){ var x=ps[i]||{c:0,p:0};
-    h+='<button type="button" class="pal" data-pal="'+i+'" aria-pressed="'+(s.palet===i)+'"><b>'+i+'</b><small>'+nf(x.c)+' ctn</small></button>'; }
+  for(var i=1;i<=n;i++){ var x=ps[i]||{c:0,p:0,r:0};
+    h+='<button type="button" class="pal" data-pal="'+i+'" aria-pressed="'+(s.palet===i)+'" title="'+nf(x.c)+' diterima'+(x.r?' + '+nf(x.r)+' ditolak':'')+'"><b>'+i+'</b><small>'+nf(x.c+x.r)+' ctn</small>'+(x.r?'<small class="palr">'+nf(x.r)+' ditolak</small>':'')+'</button>'; }
   h+='<button type="button" class="pal add" id="bPalet" aria-label="Tambah palet baru">+<small>Baru</small></button></div></div>';
   return h;
 }
@@ -1257,15 +1278,40 @@ function paletView(pl,s){
     if(v!=='all'&&v!==j) continue;
     var rows=agg[j]||{}, keys=Object.keys(rows).filter(function(k){var l=byK[k]; return !l||iqMatch([l.desc,l.code,l.batch,l.or,'#'+l.no]);}).sort(function(a,b){return (byK[a]?byK[a].no:0)-(byK[b]?byK[b].no:0);});
     var tc=0,tp=0; keys.forEach(function(k){tc+=rows[k].c;tp+=rows[k].p;});
-    h+='<div class="it-grp g-prog">Palet '+j+(s.palet===j?' · aktif':'')+'<span>'+nf(tc)+' ctn · '+nf(tp)+' pcs · '+keys.length+' item</span></div>';
-    if(!keys.length){ h+='<div style="padding:12px 14px" class="muted">Belum ada scan di palet ini.</div>'; continue; }
+    var rg=rejGroups(pl,s,function(e){return (e.palet||1)===j&&e.res!=='REMAIN';});
+    var rc=0,rpc=0; rg.forEach(function(g){rc+=g.n;rpc+=g.pcs;});
+    h+='<div class="it-grp g-prog">Palet '+j+(s.palet===j?' · aktif':'')+'<span>'+nf(tc+rc)+' ctn'+(rc?' ('+nf(rc)+' ditolak)':'')+' · '+nf(tp+rpc)+' pcs · '+keys.length+' item</span></div>';
+    if(!keys.length&&!rg.length){ h+='<div style="padding:12px 14px" class="muted">Belum ada scan di palet ini.</div>'; continue; }
     keys.forEach(function(k){var l=byK[k]||{no:'-',desc:k,code:'',batch:'',pk:0};
-      h+='<div class="it"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+'</div></div>'+
+      h+='<div class="it"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2"><span class="mno">No '+esc(l.no)+' · </span>'+esc(l.code)+'</div></div>'+
         '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+nf(rows[k].c)+' ctn</span>'+
         '<span class="r c-done" style="font-size:13px;font-weight:500">'+nf(rows[k].p)+' pcs</span><span class="c-st"></span></div>';
     });
+    rg.forEach(function(g){
+      h+='<div class="it bad"><span class="c-no muted">'+esc(g.no)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(g.name)+'</div><div class="d2">'+esc(g.sub)+'</div></div>'+
+        '<span class="c-batch mono" style="font-size:13px">'+esc(g.batch||'-')+'</span><span class="r c-tgt" style="font-size:13px">'+nf(g.n)+' ctn</span>'+
+        '<span class="r c-done" style="font-size:13px;font-weight:500">'+(g.pcs?nf(g.pcs)+' pcs':'-')+'</span><span class="c-st"><span class="chip chip-r">'+esc(REJ_NAME[g.res]||g.res)+'</span></span></div>';
+    });
   }
   return h;
+}
+/** Kelompokkan scan ditolak: ItemCode + Batch + alasan sama = 1 baris (barcode rusak: per isi barcode). */
+function rejGroups(pl,s,filt){
+  var byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
+  var m={}, out=[];
+  rejectedOf(s).forEach(function(e){
+    if(filt&&!filt(e)) return;
+    var key=e.res==='FORMAT'?('F|'+(e.raw||'')):(e.res+'|'+(e.code||'')+'|'+String(e.batch||'').toUpperCase());
+    var g=m[key];
+    if(!g){ var l=byK[e.line];
+      g=m[key]={key:key,res:e.res,code:e.code||'',batch:e.batch||'',n:0,pcs:0,first:e.t,last:e.t,by:{},ids:[],
+        no:l?l.no:'-', name:l?l.desc:(e.res==='FORMAT'?String(e.raw||'').slice(0,60):(e.res==='NOTIN'?'Item tidak ada di PL ini':(e.code||e.raw||''))),
+        sub:l?('Item '+l.no+' · '+(e.code||'')):(e.res==='FORMAT'?'Isi barcode':(e.code||''))};
+      out.push(g); }
+    g.n++; g.pcs+=rejPer(e); g.first=Math.min(g.first,e.t); g.last=Math.max(g.last,e.t); if(e.by) g.by[e.by]=1; g.ids.push(e.id);
+  });
+  out.sort(function(a,b){return b.last-a.last;});
+  return out;
 }
 /** Keterangan: karton penuh yang discan vs total karton penuh di PL. */
 function ctnState(st){
@@ -1281,6 +1327,7 @@ function kpiBtn(f,label,val,aria){
 }
 /** Log scan diterima (f='log') atau ditolak (f='rej'), terbaru di atas. */
 function scanLog(pl,s,f){
+  if(f==='rej') return rejLog(pl,s);
   var list=f==='log'?okEvents(s):rejectedOf(s), h='';
   var byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
   if(APP.iq) list=list.filter(function(e){var l=byK[e.line]; return iqMatch([l?l.desc:'',e.code,e.batch,e.raw,l?'#'+l.no:'']);});
@@ -1297,6 +1344,28 @@ function scanLog(pl,s,f){
   });
   if(list.length>300) h+='<div style="padding:10px 14px" class="muted">Menampilkan 300 terakhir dari '+list.length+'.</div>';
   return h;
+}
+function rejLog(pl,s){
+  var gs=rejGroups(pl,s), h='';
+  if(APP.iq) gs=gs.filter(function(g){return iqMatch([g.name,g.code,g.batch,g.sub,'#'+g.no]);});
+  if(!gs.length) return '<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada scan yang cocok dengan pencarian.':'Tidak ada scan yang ditolak.')+'</div>';
+  var tot=0; gs.forEach(function(g){tot+=g.n;});
+  h+='<div class="iqinfo" style="background:var(--err-soft);color:var(--err)">'+nf(tot)+' karton ditolak dalam '+gs.length+' kelompok (item + batch + alasan sama digabung)</div>';
+  h+='<div class="lg rg head"><span>Jam</span><span>Item</span><span class="c-batch">Batch</span><span>Hasil</span><span class="r">Total</span><span></span></div>';
+  gs.forEach(function(g){
+    var jam=g.first===g.last?hhmm(g.last):(hhmm(g.first).slice(0,5)+'–'+hhmm(g.last).slice(0,5));
+    h+='<div class="lg rg"><span class="muted" style="font-size:12px">'+jam+'</span><div style="min-width:0"><div class="d1 ell">'+esc(g.name)+'</div><div class="d2"><span class="mres">'+esc(REJ_NAME[g.res]||g.res)+' · </span>'+esc(g.sub)+(Object.keys(g.by).length?' · '+esc(Object.keys(g.by).join(', ')):'')+'</div></div>'+
+      '<span class="c-batch mono" style="font-size:13px">'+esc(g.batch||'-')+'</span>'+
+      '<span><span class="chip '+(g.res==='REMAIN'?'chip-w':'chip-r')+'">'+esc(REJ_NAME[g.res]||g.res)+'</span></span>'+
+      '<span class="r" style="font-size:13px;font-weight:500">'+nf(g.n)+' ctn'+(g.pcs?'<small class="dpcs">'+nf(g.pcs)+' pcs</small>':'')+'</span>'+
+      '<span class="c-act">'+(s.submitted?'':cBtn('G:'+g.key,'Hapus','hapus '+g.n+' scan ditolak '+g.name))+'</span></div>';
+  });
+  return h;
+}
+function voidGroup(key){
+  var pl=plById(APP.pl),s=sess(pl.pl), g=rejGroups(pl,s).filter(function(x){return x.key===key;})[0]; if(!g) return;
+  var ids={}; g.ids.forEach(function(id){ids[id]=1;});
+  voidEvents(pl,s,rejectedOf(s).filter(function(e){return ids[e.id];}),nf(g.n)+' scan ditolak dihapus · '+g.name);
 }
 function kv(k,v){return '<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px"><span class="muted">'+esc(k)+'</span><span>'+esc(v)+'</span></div>';}
 
@@ -1556,7 +1625,7 @@ function bind(){
     on('bIqX','click',function(){ APP.iq=''; APP.iqFocus=false; render(); focusScan(); });
     each('[data-cf]',function(b){b.addEventListener('click',function(){var key=b.getAttribute('data-cf');
       confirmTap(key,function(){ var t=key.slice(0,2), v=key.slice(2);
-        if(t==='L:') resetLine(v); else if(t==='S:') voidStray(v); else if(t==='E:') voidOne(v); });});});
+        if(t==='L:') resetLine(v); else if(t==='S:') voidStray(v); else if(t==='E:') voidOne(v); else if(t==='G:') voidGroup(v); });});});
     each('[data-kf]',function(b){b.addEventListener('click',function(){var f=b.getAttribute('data-kf'); APP.itemFilter=APP.itemFilter===f?'all':f; render();
       var sec=$('#itemsSec'); if(sec&&sec.scrollIntoView) sec.scrollIntoView({behavior:'smooth',block:'start'}); focusScan();});});
     if(APP.input==='camera'&&!APP.cam) camStart();
