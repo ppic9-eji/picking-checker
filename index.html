@@ -134,6 +134,8 @@ button{cursor:pointer}
 .lg.rg{grid-template-columns:96px minmax(160px,1fr) 100px 150px 90px 72px}
 .lg .mres{display:none;color:var(--err);font-weight:500}
 .lg .dpcs{display:block;font-size:11px;font-weight:400;color:var(--muted)}
+.lg.lrow-rej{background:#FEF6F6}
+.lg .lrej{color:var(--err);font-weight:500}
 .chip.sap{background:#fff;border:1px solid var(--line);color:var(--ink);gap:6px;padding:0 8px 0 4px;font-weight:400}
 .chip.sap .sap-k{font-size:10px;font-weight:500;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#EEF2F8;color:var(--muted)}
 .chip.sap-r .sap-k{background:var(--pri-soft);color:var(--pri)}
@@ -588,10 +590,11 @@ function migrateLineRefs(pl,s){
   ensureKeys(pl);
   var keys={}, byNo={};
   pl.lines.forEach(function(l){keys[l._k]=1; (byNo[String(l.no)]=byNo[String(l.no)]||[]).push(l);});
+  function byCode(code){ var m=pl.lines.filter(function(l){return l.code===code;})[0]; return m?m._k:null; }
   function byCB(code,batch){ var B=String(batch||'').toUpperCase(); var m=pl.lines.filter(function(l){return l.code===code&&String(l.batch).toUpperCase()===B;})[0]; return m?m._k:null; }
   function map(old,code,batch){
     if(old==null||keys[old]) return old;
-    var c=byNo[String(old)]; if(!c||!c.length) return (code&&byCB(code,batch))||old;
+    var c=byNo[String(old)]; if(!c||!c.length) return (code&&(byCB(code,batch)||byCode(code)))||old;
     if(c.length===1) return c[0]._k;
     var B=String(batch||'').toUpperCase();
     var m=c.filter(function(l){return l.code===code&&String(l.batch).toUpperCase()===B;})[0]||c.filter(function(l){return l.code===code;})[0];
@@ -1028,7 +1031,7 @@ function vScan(){
     if(k===APP.lastLine) grp='cur';
     return {l:l,k:k,got:got,stt:stt,err:err,grp:grp};});
   var extra=strayRejects(s);
-  var cnt={all:rows.length+extra.length,prog:0,err:extra.length,todo:0,done:0,log:okEvents(s).length,rej:st.rejected,pal:s.palCount||1};
+  var cnt={all:rows.length+extra.length,prog:0,err:extra.length,todo:0,done:0,log:okEvents(s).length+rejectedOf(s).length,rej:st.rejected,pal:s.palCount||1};
   rows.forEach(function(r){
     if(r.stt==='done') cnt.done++; else if(r.err) cnt.err++; else if(r.got>0) cnt.prog++; else cnt.todo++;
     if(r.grp==='cur'&&!(r.stt!=='done'&&!r.err&&r.got>0)) cnt.prog++;
@@ -1220,8 +1223,8 @@ function lineErrors(pl,s){
   var out={};
   rejectedOf(s).forEach(function(e){
     if(e.res!=='BATCH'&&e.res!=='OVER') return;
-    var k=e.line;
-    if(!k&&e.code){ var l=pl.lines.filter(function(x){return x.code===e.code;})[0]; if(l) k=lineKey(l); }
+    var k=e.line, has=k&&pl.lines.some(function(x){return lineKey(x)===k;});
+    if(!has&&e.code){ var l=lineOfEvent(pl,e); k=l?lineKey(l):null; }
     if(k) out[k]=(out[k]||0)+1;
   });
   return out;
@@ -1295,6 +1298,13 @@ function paletView(pl,s){
   }
   return h;
 }
+/** Baris PL milik sebuah event; kalau kuncinya tidak cocok lagi, cari lewat ItemCode. */
+function lineOfEvent(pl,e,byK){
+  var l=byK?byK[e.line]:null;
+  if(!l) l=pl.lines.filter(function(x){return lineKey(x)===e.line;})[0];
+  if(!l&&e.code) l=pl.lines.filter(function(x){return x.code===e.code&&String(x.batch).toUpperCase()===String(e.batch||'').toUpperCase();})[0]||pl.lines.filter(function(x){return x.code===e.code;})[0];
+  return l||null;
+}
 /** Kelompokkan scan ditolak: ItemCode + Batch + alasan sama = 1 baris (barcode rusak: per isi barcode). */
 function rejGroups(pl,s,filt){
   var byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
@@ -1303,7 +1313,7 @@ function rejGroups(pl,s,filt){
     if(filt&&!filt(e)) return;
     var key=e.res==='FORMAT'?('F|'+(e.raw||'')):(e.res+'|'+(e.code||'')+'|'+String(e.batch||'').toUpperCase());
     var g=m[key];
-    if(!g){ var l=byK[e.line];
+    if(!g){ var l=lineOfEvent(pl,e,byK);
       g=m[key]={key:key,res:e.res,code:e.code||'',batch:e.batch||'',n:0,pcs:0,first:e.t,last:e.t,by:{},ids:[],
         no:l?l.no:'-', name:l?l.desc:(e.res==='FORMAT'?String(e.raw||'').slice(0,60):(e.res==='NOTIN'?'Item tidak ada di PL ini':(e.code||e.raw||''))),
         sub:l?('Item '+l.no+' · '+(e.code||'')):(e.res==='FORMAT'?'Isi barcode':(e.code||''))};
@@ -1328,19 +1338,23 @@ function kpiBtn(f,label,val,aria){
 /** Log scan diterima (f='log') atau ditolak (f='rej'), terbaru di atas. */
 function scanLog(pl,s,f){
   if(f==='rej') return rejLog(pl,s);
-  var list=f==='log'?okEvents(s):rejectedOf(s), h='';
+  var list=okEvents(s).concat(rejectedOf(s)).sort(function(a,b){return a.t-b.t;}), h='';
   var byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
-  if(APP.iq) list=list.filter(function(e){var l=byK[e.line]; return iqMatch([l?l.desc:'',e.code,e.batch,e.raw,l?'#'+l.no:'']);});
-  if(!list.length) return '<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada scan yang cocok dengan pencarian.':f==='log'?'Belum ada scan diterima.':'Tidak ada scan yang ditolak.')+'</div>';
-  h+='<div class="lg head"><span>Jam</span><span>Item</span><span class="c-batch">Batch</span><span class="r">'+(f==='log'?'Jumlah':'Hasil')+'</span><span class="c-pal">'+(f==='log'?'Palet':'Oleh')+'</span><span></span></div>';
+  if(APP.iq) list=list.filter(function(e){var l=lineOfEvent(pl,e,byK); return iqMatch([l?l.desc:'',e.code,e.batch,e.raw,l?'#'+l.no:'',REJ_NAME[e.res]||'']);});
+  if(!list.length) return '<div style="padding:20px 14px" class="muted">'+(APP.iq?'Tidak ada scan yang cocok dengan pencarian.':'Belum ada scan.')+'</div>';
+  var nRej=list.filter(function(e){return e.res!=='OK';}).length;
+  if(nRej) h+='<div class="iqinfo">'+nf(list.length)+' scan · '+nf(list.length-nRej)+' diterima · <b style="color:var(--err);font-weight:500">'+nf(nRej)+' ditolak</b> (baris merah)</div>';
+  h+='<div class="lg head"><span>Jam</span><span>Item</span><span class="c-batch">Batch</span><span class="r">Jumlah</span><span class="c-pal">Palet</span><span></span></div>';
   list.slice(-300).reverse().forEach(function(e){
-    var l=byK[e.line];
-    var nm=l?l.desc:(e.code||e.raw||'');
-    var sub=l?('Item '+l.no+' · '+(e.code||'')):(e.res==='FORMAT'?'Isi barcode':String(e.raw||'').slice(0,48));
+    var l=lineOfEvent(pl,e,byK), ok=e.res==='OK';
+    var nm=l?l.desc:(e.res==='NOTIN'?'Item tidak ada di PL ini':(e.code||e.raw||''));
+    var sub=l?('Item '+l.no+' · '+(e.code||'')):(e.res==='FORMAT'?'Isi barcode':(e.code||String(e.raw||'').slice(0,48)));
     if(!l&&e.res==='FORMAT') nm=String(e.raw||'').slice(0,60);
-    var q=f==='log'?(e.kind==='ctn'?'+1 ctn':'+'+nf(e.pcs)+' pcs'):'<span class="chip '+(e.res==='REMAIN'?'chip-w':'chip-r')+'">'+esc(REJ_NAME[e.res]||e.res)+'</span>';
-    h+='<div class="lg"><span class="muted">'+hhmm(e.t)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(nm)+'</div><div class="d2">'+esc(sub)+'</div></div>'+
-      '<span class="c-batch mono" style="font-size:13px">'+esc(e.batch||'-')+'</span><span class="r" style="font-size:13px;font-weight:500">'+q+'</span><span class="c-pal muted" style="font-size:12px">'+esc(f==='log'?('P'+(e.palet||1)):(e.by||''))+'</span><span class="c-act">'+(sess(pl.pl).submitted?'':cBtn('E:'+e.id,'Hapus',(f==='log'?'batalkan scan ':'hapus scan ditolak ')+nm))+'</span></div>';
+    if(!ok) sub='<b class="lrej">Ditolak: '+esc(REJ_NAME[e.res]||e.res)+'</b> · '+esc(sub); else sub=esc(sub);
+    var per=ok?0:rejPer(e);
+    var q=ok?(e.kind==='ctn'?'+1 ctn':'+'+nf(e.pcs)+' pcs'):'<span class="chip '+(e.res==='REMAIN'?'chip-w':'chip-r')+'">Ditolak</span>'+(per?'<small class="dpcs">1 ctn · '+nf(per)+' pcs</small>':'');
+    h+='<div class="lg'+(ok?'':' lrow-rej')+'"><span class="muted">'+hhmm(e.t)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(nm)+'</div><div class="d2">'+sub+'</div></div>'+
+      '<span class="c-batch mono" style="font-size:13px">'+esc(e.batch||'-')+'</span><span class="r" style="font-size:13px;font-weight:500">'+q+'</span><span class="c-pal muted" style="font-size:12px">P'+esc(e.palet||1)+'</span><span class="c-act">'+(sess(pl.pl).submitted?'':cBtn('E:'+e.id,'Hapus',(ok?'batalkan scan ':'hapus scan ditolak ')+nm))+'</span></div>';
   });
   if(list.length>300) h+='<div style="padding:10px 14px" class="muted">Menampilkan 300 terakhir dari '+list.length+'.</div>';
   return h;
