@@ -538,6 +538,8 @@ async function makeFirebaseDB() {
 /* ================= Util ================= */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function nf(n){return Number(n||0).toLocaleString('id-ID');}
+/** Kolom Ctn: nilai CTN dari Spreadsheet kalau ada, kalau tidak dihitung pcs / isi karton. */
+function ctnOf(l){ if(l.ctn!==null&&l.ctn!==undefined&&l.ctn!=='') return Number(l.ctn).toLocaleString('id-ID',{maximumFractionDigits:2})+' ctn'; return ctnDec(l.qty,l.pk); }
 function ctnDec(pcs,pk){ if(!pk) return '-'; return (Math.round(pcs/pk*100)/100).toLocaleString('id-ID',{maximumFractionDigits:2})+' ctn'; }
 function fmtQ(pcs,pk){
   pcs=Math.max(0,Math.round(pcs||0));
@@ -1092,10 +1094,10 @@ function vScan(){
       h+='<div class="it t8'+(r.k===APP.lastLine?' flash':'')+(r.stt!=='done'&&r.err?' bad':'')+'"><span class="c-no muted">'+l.no+'</span>'+
         '<div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2">'+esc(l.code)+((pl.ors||[]).length>1?' · OR '+esc(l.or):'')+
 '</div>'+(l.nos&&l.nos.length>1?'<div class="dg">Gabungan No '+esc(l.nos.join(', '))+'</div>':'')+
-        '<div class="tdet"><span class="mno">No '+esc(l.no)+' · </span>Total '+nf(l.qty)+' pcs · '+ctnDec(l.qty,l.pk)+'</div>'+
+        '<div class="tdet"><span class="mno">No '+esc(l.no)+' · </span>Total '+nf(l.qty)+' pcs · '+ctnOf(l)+'</div>'+
         (r.err?'<div class="d3">'+r.err+' scan ditolak · lihat tab Ditolak</div>':'')+'</div>'+
         '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+fmtQ(l.qty,l.pk)+'</span>'+
-        '<span class="r c-tp" style="font-size:13px">'+nf(l.qty)+'</span><span class="r c-td" style="font-size:13px">'+(l.pk?ctnDec(l.qty,l.pk).replace(' ctn',''):'-')+'</span>'+
+        '<span class="r c-tp" style="font-size:13px">'+nf(l.qty)+'</span><span class="r c-td" style="font-size:13px">'+ctnOf(l).replace(' ctn','')+'</span>'+
         '<span class="r c-done" style="font-size:13px;font-weight:500">'+(r.got?fmtQ(r.got,l.pk):'0')+'<span class="c-of"> / '+fmtQ(l.qty,l.pk)+'</span>'+
         (r.got&&l.pk?'<small class="dpcs">'+nf(r.got)+' pcs</small>':'')+'</span><span class="c-st"><span class="chip '+tag[0]+'">'+tag[1]+'</span>'+
         ((r.got||r.err)&&!sess(pl.pl).submitted?cBtn('L:'+r.k,'Reset','reset item '+l.desc):'')+'</span></div>';
