@@ -458,6 +458,7 @@ async function makeFirebaseDB() {
           var x = d.data();
           x.pl = d.id;
           x.lockAt = x.lock ? toMs(x.lock.at) : 0;
+          x.syncedAtMs = toMs(x.syncedAt);
           list.push(x);
         });
         list.sort(function (a, b) { return a.pl < b.pl ? 1 : -1; });
@@ -477,6 +478,11 @@ async function makeFirebaseDB() {
     },
     heartbeat: function (pl) {
       return F.updateDoc(plRef(pl), { lock: { uid: me.uid, id: me.id, at: F.serverTimestamp() } });
+    },
+    requestRefresh: function (ids) {
+      var b = F.writeBatch(db);
+      ids.forEach(function (id) { b.set(F.doc(db, 'refresh', String(id)), { uid: me.uid, id: me.id, at: F.serverTimestamp() }); });
+      return b.commit();
     },
     setStatus: function (pl, st) {
       return F.updateDoc(plRef(pl), { lock: { uid: me.uid, id: me.id, at: F.serverTimestamp() }, status: st });
@@ -895,6 +901,7 @@ function vLogin(){
 
 /* ===== Tampilan v2: shell (sidebar + topbar), kartu PL, detail dengan panel kanan ===== */
 var IC2={
+  sync:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/></svg>',
   xls:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="m9 13 4 5m0-5-4 5"/></svg>',
   list:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>',
   cal:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
@@ -945,7 +952,7 @@ function vList(){
   var top=topbar('<div class="tsearch has-search">'+ICON.search+'<label class="sr" for="q">Cari picking list</label><input id="q" value="'+esc(APP.q)+'" placeholder="Scan / ketik No. PL, OR, atau customer lalu Enter"></div>');
   var h='<div class="crumb">Operasional <span>/</span> <b>Picking List</b></div>';
   h+='<div class="doc-head"><div><h1>Picking List</h1><div class="muted">'+APP.pls.length+' picking list aktif · Gudang '+esc((APP.pls[0]&&APP.pls[0].wh)||'-')+' · sinkron dari SAP</div></div>'+
-    '<div class="doc-act"><button type="button" class="btn" id="bExport">'+IC2.xls+'Export Excel</button></div></div>';
+    '<div class="doc-act"><button type="button" class="btn" id="bRefresh">'+IC2.sync+'Refresh dari SAP</button><button type="button" class="btn" id="bExport">'+IC2.xls+'Export Excel</button></div></div>';
   if(APP.plsErr) h+='<div class="note" style="background:var(--err-soft);color:var(--err);margin-bottom:12px">'+esc(APP.plsErr)+'</div>';
   var names={todo:'Belum dicek',busy:'Sedang dicek',diff:'Ada selisih',done:'Selesai',all:'Semua'};
   h+='<nav class="tabs" aria-label="Filter status">';
@@ -965,7 +972,7 @@ function vList(){
     var status=plStatus(p), mine=p.lock&&APP.me&&p.lock.uid===APP.me.uid;
     var who=status==='busy'?(lockActive(p)?('Dicek '+(mine?'Anda':(p.lock.id||''))):'Kunci lepas'):(lockActive(p)&&(status==='todo')?('Dibuka '+(mine?'Anda':(p.lock.id||''))):'');
     h+='<div class="plwrap"><button type="button" class="plcard" data-pl="'+esc(p.pl)+'">'+
-      '<div class="c-pl"><div class="pl-top">'+stChip(status)+'<span class="plno">PL '+esc(p.pl)+'</span>'+sapChip(p)+'</div>'+
+      '<div class="c-pl"><div class="pl-top">'+stChip(status)+'<span class="plno">PL '+esc(p.pl)+'</span>'+sapChip(p)+(refreshPending(p)?'<span class="chip chip-b">Menunggu refresh…</span>':'')+'</div>'+
         '<div class="meta"><span>'+IC2.cal+esc(p.date||'-')+'</span><span>'+IC2.user+'Picker '+esc(p.picker||'-')+'</span>'+(who?'<span class="who-l">'+esc(who)+'</span>':'')+'</div></div>'+
       '<div class="c-cust col"><span class="lab">Customer</span><span class="val ell">'+esc(p.cust)+'</span><span class="sub ell">OR '+esc((p.ors||[]).join(' · '))+'</span></div>'+
       '<div class="c-lines col r"><span class="lab">Item</span><span class="val">'+ag.items+'</span></div>'+
@@ -1018,7 +1025,7 @@ function vScan(){
       '<div class="btn2"><button type="button" class="btn" id="bUndo">Batalkan scan</button><button type="button" class="btn" id="bEcer">Input ecer</button></div>'+
       '<button type="button" class="btn pri block monly" id="bSum2" style="margin-top:10px;height:52px">Selesai &amp; ringkasan</button></div>'+
     '<div class="card pad mhide"><div class="ctitle">Checker</div><div class="who">'+avatar(u.id)+'<div><div style="font-weight:500">'+esc(u.name||u.id||'')+'</div><div class="muted" style="font-size:12px">'+esc(u.id||'')+'</div></div></div></div>'+
-    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Status SAP',sapLabel(pl.sap)||'-')+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Item',String(itemAgg(pl.lines).items)+(itemAgg(pl.lines).items!==pl.lines.length?' ('+pl.lines.length+' baris batch)':''))+'</div>'+
+    '<div class="card pad mhide"><div class="ctitle">Informasi Picking</div>'+kv('Status SAP',sapLabel(pl.sap)||'-')+kv('Sinkron terakhir',pl.syncedAtMs?new Date(pl.syncedAtMs).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'-')+kv('Tanggal pick',pl.date||'-')+kv('Picker',pl.picker||'-')+kv('Gudang',pl.wh||'-')+kv('OR',(pl.ors||[]).join(', '))+kv('Item',String(itemAgg(pl.lines).items)+(itemAgg(pl.lines).items!==pl.lines.length?' ('+pl.lines.length+' baris batch)':''))+'<button type="button" class="btn" id="bRefPl" style="height:40px;margin-top:10px;width:100%">'+(refreshPending(pl)?'Menunggu refresh dari SAP…':'Refresh PL ini dari SAP')+'</button>'+'</div>'+
     '<div class="card pad mhide"><div class="ctitle">Customer</div><div style="font-weight:500;margin-bottom:4px">'+esc(pl.cust)+'</div><div class="muted" style="font-size:12px">'+esc(pl.rem)+'</div></div>'+
   '</aside>';
 
@@ -1182,12 +1189,14 @@ function vModal(){
     var ids=Object.keys(m.sel).sort(function(a,b){return a<b?1:-1;}), q=String(m.q||'').toLowerCase();
     var vis=ids.filter(function(id){var p=plById(id); return !q||(id+' '+(p?p.cust+' '+(p.ors||[]).join(' '):'')).toLowerCase().indexOf(q)>=0;});
     var nSel=ids.filter(function(id){return m.sel[id];}).length;
-    var h='<div class="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="mh"><div><div class="muted" style="font-size:12px">Hasil pengecekan</div><h2 id="mt" style="margin:2px 0 0;font-size:19px;font-weight:500">Export Excel</h2></div><button type="button" class="iconbtn" id="mClose" aria-label="Tutup">'+ICON.x+'</button></div><div class="mb">';
-    h+='<div class="seg" role="group" aria-label="Pilihan export" style="width:100%"><button type="button" data-xm="pick" aria-pressed="'+(m.mode==='pick')+'" style="flex:1">Pilih PL</button><button type="button" data-xm="all" aria-pressed="'+(m.mode==='all')+'" style="flex:1">Semua hasil</button></div>';
+    var RF=m.kind==='refresh';
+    var h='<div class="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="mh"><div><div class="muted" style="font-size:12px">'+(RF?'Tarik ulang data dari SAP':'Hasil pengecekan')+'</div><h2 id="mt" style="margin:2px 0 0;font-size:19px;font-weight:500">'+(RF?'Refresh dari SAP':'Export Excel')+'</h2></div><button type="button" class="iconbtn" id="mClose" aria-label="Tutup">'+ICON.x+'</button></div><div class="mb">';
+    if(RF) h+='<div class="note">Pilih PL yang datanya di dashboard belum sama dengan SAP/Sheet. GAS menarik ulang dari SAP dan mengirimnya dalam ±1–2 menit. Maksimal '+REFRESH_MAX+' PL sekali kirim. Scan yang sudah ada tidak hilang.</div>';
+    else h+='<div class="seg" role="group" aria-label="Pilihan export" style="width:100%"><button type="button" data-xm="pick" aria-pressed="'+(m.mode==='pick')+'" style="flex:1">Pilih PL</button><button type="button" data-xm="all" aria-pressed="'+(m.mode==='all')+'" style="flex:1">Semua hasil</button></div>';
     if(m.mode==='all'){
       h+='<div class="note">Semua PL yang sudah disubmit, termasuk PL yang sudah tidak aktif di daftar (selama datanya belum dihapus oleh arsip bulanan, '+'2 bulan terakhir).</div>';
     } else if(!ids.length){
-      h+='<div class="note">Belum ada PL yang selesai dicek di daftar. Pakai "Semua hasil" untuk PL lama, atau buka PL lalu export dari halaman ringkasannya.</div>';
+      h+=RF?'<div class="note">Belum ada PL di daftar.</div>':'<div class="note">Belum ada PL yang selesai dicek di daftar. Pakai "Semua hasil" untuk PL lama, atau buka PL lalu export dari halaman ringkasannya.</div>';
     } else {
       h+='<input id="xq" class="inp" placeholder="Cari No. PL, OR, atau customer" value="'+esc(m.q||'')+'" autocomplete="off">';
       h+='<div class="xbar"><label class="xchk"><input type="checkbox" id="xAll"'+(vis.length&&vis.every(function(id){return m.sel[id];})?' checked':'')+'> Pilih semua yang tampil ('+vis.length+')</label><span class="muted">'+nSel+' dipilih</span></div><div class="xlist">';
@@ -1196,7 +1205,7 @@ function vModal(){
       if(!vis.length) h+='<div class="muted" style="padding:10px 4px">Tidak ada yang cocok.</div>';
       h+='</div>';
     }
-    h+='</div><div class="mf"><button type="button" class="btn" id="mCancel">Batal</button><button type="button" class="btn pri" id="xGo"'+(m.mode==='pick'&&!nSel?' disabled':'')+'>'+IC2.xls+(m.mode==='all'?'Download semua':'Download '+nSel+' PL')+'</button></div></div></div>';
+    h+='</div><div class="mf"><button type="button" class="btn" id="mCancel">Batal</button><button type="button" class="btn pri" id="xGo"'+((m.mode==='pick'&&!nSel)||(RF&&nSel>REFRESH_MAX)?' disabled':'')+'>'+(RF?IC2.sync+(nSel>REFRESH_MAX?'Maks '+REFRESH_MAX+' PL':'Refresh '+nSel+' PL'):IC2.xls+(m.mode==='all'?'Download semua':'Download '+nSel+' PL'))+'</button></div></div></div>';
     return h;
   }
   if(m.type==='ecer'){
@@ -1561,6 +1570,45 @@ function openExport(){
   APP.modal={type:'export',mode:'pick',sel:sel,q:''}; render();
 }
 
+/* ================= Daftar PL: dengar perubahan, sambung ulang otomatis ================= */
+var LISTW={tries:0,t:null};
+function watchList(){
+  clearTimeout(LISTW.t); LISTW.t=null;
+  if(APP.unsubList){ try{APP.unsubList();}catch(e){} APP.unsubList=null; }
+  APP.unsubList=DB.watchPicklists(function(list){
+    list.forEach(ensureKeys); APP.pls=list; APP.plsErr=''; LISTW.tries=0;
+    if(APP.view==='list') render();
+  },function(err){
+    var code=(err&&(err.code||err.message))||'error';
+    if(APP.unsubList){ try{APP.unsubList();}catch(e){} APP.unsubList=null; }
+    LISTW.tries++;
+    var wait=Math.min(300, 15*Math.pow(2,LISTW.tries-1));        // 15s, 30s, 60s, ... maks 5 menit
+    APP.plsErr='Data PL tidak ter-update ('+code+(code==='resource-exhausted'?': kuota Firestore habis':'')+'). Menyambung ulang otomatis dalam '+wait+' detik. Data di layar bisa belum terbaru.';
+    LISTW.t=setTimeout(watchList,wait*1000);
+    if(APP.view==='list') render();
+  });
+}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden&&APP.plsErr&&APP.me) watchList(); });
+
+/* ================= Refresh dari SAP (diproses GAS dalam ±1 menit) ================= */
+var REFRESH_MAX=15;
+APP.refreshReq=APP.refreshReq||{};
+function refreshPending(p){ var t=APP.refreshReq[p.pl]; if(!t) return false; if((p.syncedAtMs||0)>=t-5000||now()-t>10*60000){ delete APP.refreshReq[p.pl]; return false; } return true; }
+async function requestRefresh(ids){
+  ids=ids.slice(0,REFRESH_MAX);
+  if(!ids.length) return;
+  try{
+    await DB.requestRefresh(ids);
+    var t=now(); ids.forEach(function(id){APP.refreshReq[id]=t;});
+    toast('Permintaan refresh '+ids.length+' PL dikirim. Data dari SAP biasanya masuk dalam 1–2 menit.');
+    APP.modal=null; render();
+  }catch(e){ toast('Gagal mengirim permintaan refresh: '+(e.code||e.message)); }
+}
+function openRefresh(){
+  var sel={}; APP.pls.forEach(function(p){ sel[p.pl]=false; });
+  APP.modal={type:'export',kind:'refresh',mode:'pick',sel:sel,q:''}; render();
+}
+
 /* ================= Event binding ================= */
 function on(id,ev,fn){var el=document.getElementById(id); if(el) el.addEventListener(ev,fn);}
 function focusScan(){ if(APP.view!=='scan'||APP.modal||APP.input!=='scanner'||APP.iqFocus) return; var i=$('#scan'); if(i&&!i.disabled){ i.focus(); } }
@@ -1591,6 +1639,7 @@ function bind(){
   }
   if(APP.view==='list'){
     on('bExport','click',openExport);
+    on('bRefresh','click',openRefresh);
     if(APP.modal&&APP.modal.type==='export') bindModal();
     var q=$('#q'); if(q){ q.addEventListener('input',function(){APP.q=q.value; var pos=q.selectionStart; render(); var q2=$('#q'); q2.focus(); try{q2.setSelectionRange(pos,pos);}catch(e){}});
       q.addEventListener('keydown',function(e){ if(e.key==='Enter'){ var v=q.value.trim(); var p=plById(v)||APP.pls.filter(function(x){return (x.ors||[]).indexOf(v)>=0;})[0]; if(p) openPl(p.pl); else toast('PL '+v+' tidak ditemukan.'); }}); }
@@ -1617,6 +1666,7 @@ function bind(){
     var goSum=function(){camStop();flush();APP.view='sum';render();window.scrollTo(0,0);};
     on('bSum','click',goSum); on('bSum2','click',goSum);
     on('bType','click',function(){APP.typing=!APP.typing;render();focusScan();});
+    on('bRefPl','click',function(){ var pl=plById(APP.pl); if(pl&&!refreshPending(pl)) requestRefresh([pl.pl]); focusScan(); });
     on('bPalet','click',function(){var s=sess(APP.pl); s.palCount=Math.max(s.palCount||1,s.palet)+1; s.palet=s.palCount; toast('Palet '+s.palet+' dibuat dan aktif. Scan berikutnya masuk palet ini.'); render(); focusScan();});
     each('[data-pal]',function(b){b.addEventListener('click',function(){var s=sess(APP.pl), n=Number(b.getAttribute('data-pal')); if(s.palet!==n){ s.palet=n; toast('Palet '+n+' aktif. Scan berikutnya masuk palet ini.'); } render(); focusScan();});});
     each('[data-pv]',function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-pv'); APP.palView=v==='all'?'all':Number(v); render(); focusScan();});});
@@ -1673,7 +1723,8 @@ function bindModal(){
     var xq=$('#xq');
     if(xq){ xq.addEventListener('input',function(){m.q=xq.value; m.qFocus=true; render();});
       if(m.qFocus){ xq.focus(); try{xq.setSelectionRange(xq.value.length,xq.value.length);}catch(e){} } }
-    on('xGo','click',function(){ if(m.mode==='all') exportResults(null,'Semua');
+    on('xGo','click',function(){ if(m.kind==='refresh'){ requestRefresh(Object.keys(m.sel).filter(function(id){return m.sel[id];})); return; }
+      if(m.mode==='all') exportResults(null,'Semua');
       else { var ids=Object.keys(m.sel).filter(function(id){return m.sel[id];}); exportResults(ids,ids.length===1?('PL '+ids[0]):(ids.length+' PL')); } });
     return;
   }
@@ -1704,15 +1755,12 @@ window.addEventListener('pagehide',function(){ flush(); });
     APP.me=me;
     if(!me){ APP.view='login'; if(msg) APP.authMsg=msg; APP.pls=[]; render(); return; }
     APP.authMsg=''; APP.view='list'; render();
-    APP.unsubList=DB.watchPicklists(function(list){
-      list.forEach(ensureKeys); APP.pls=list; APP.plsErr='';
-      if(APP.view==='list') render();
-    },function(err){ APP.plsErr='Gagal memuat daftar PL: '+(err.code||err.message); if(APP.view==='list') render(); });
+    watchList();
   });
 })();
 
 /* hook untuk diagnosa dari console browser (read-only use) */
-window.__pchk = { APP: APP, CFG: CFG, SESS: SESS, sess: sess, plById: plById, lineDone: lineDone, plStats: plStats, lineKey: lineKey };
+window.__pchk = { APP: APP, CFG: CFG, SESS: SESS, sess: sess, plById: plById, lineDone: lineDone, plStats: plStats, lineKey: lineKey, watchList: watchList };
 
 </script>
 </body>
