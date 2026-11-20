@@ -538,6 +538,16 @@ kbd{display:inline-block;min-width:18px;padding:0 5px;margin:0 2px;border:1px so
 @container (max-width: 470px){.hhead,.hrow{grid-template-columns:minmax(0,1fr) 92px}.hc-t,.hc-ctn{display:none}}
 @media (max-width: 1100px){.hsplit.open{grid-template-columns:minmax(0,1fr)}.hdiv,.hpane{display:none}.hinline{display:block}}
 .it.bad .c-st .chip{white-space:normal;text-align:center;line-height:1.25;padding-top:3px;padding-bottom:3px;height:auto}
+
+.pvrow{cursor:pointer;position:relative;border-left:3px solid transparent;transition:background .12s}
+.pvrow:hover{background:var(--bg)}
+.pvrow.cur{background:#FFF7DB;border-left-color:#D97706;box-shadow:inset 0 0 0 1px #F4D58A}
+.pvrow.cur::after{content:"";position:absolute;right:-1px;top:50%;margin-top:-6px;border:6px solid transparent;border-right-color:#B45309}
+.it.bad.pvrow.cur{background:#FFF1E8}
+.pvsl{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.pvs{display:grid;grid-template-columns:70px minmax(0,1.2fr) minmax(0,1fr) 80px 70px;gap:10px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line);font-size:13px}
+.pvs:last-child{border-bottom:0}
+@container (max-width: 560px){.pvs{grid-template-columns:56px minmax(0,1fr) 64px;}.pvs>span:nth-child(3),.pvs>span:nth-child(4){display:none}}
 </style>
 </head>
 <body>
@@ -1374,6 +1384,8 @@ function renderItemsOnly(){
   cur.innerHTML=nb.innerHTML;
   var x=$('#bIqX'); if(x) x.hidden=!APP.iq;
   each('#itemsBody [data-pv]',function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-pv'); APP.palView=v==='all'?'all':Number(v); render(); focusScan();});});
+  each('#itemsBody [data-pvr]',function(r){r.addEventListener('click',function(ev){ if(ev.target.closest('[data-cf]')) return; APP.pvSel=r.getAttribute('data-pvr'); APP.pvOpen=true; render(); focusScan(); });});
+  each('#itemsBody [data-ev]',function(r){r.addEventListener('click',function(ev){ if(ev.target.closest('[data-cf]')) return; APP.logSel=r.getAttribute('data-ev'); APP.logOpen=true; render(); focusScan(); });});
 }
 
 function vSum(){
@@ -1550,7 +1562,7 @@ function palRow(s){
 }
 /** Isi per palet: item PL yang discan ke palet tsb. */
 function paletView(pl,s){
-  var n=Math.max(s.palCount||1,s.palet), byK={}, agg={}, h='';
+  var n=Math.max(s.palCount||1,s.palet), byK={}, agg={}, h='', ids=[];
   pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
   okEvents(s).forEach(function(e){var p=e.palet||1; agg[p]=agg[p]||{}; var a=agg[p][e.line]=agg[p][e.line]||{c:0,p:0,bd:null}; if(e.kind==='ctn')a.c++; a.p+=e.pcs;
     if(e.bd){ a.bd=a.bd||{}; var b=String(e.batch||'?'), o=a.bd[b]=a.bd[b]||{n:0,pcs:0}; if(e.kind==='ctn') o.n++; o.pcs+=e.pcs||0; } });
@@ -1558,28 +1570,83 @@ function paletView(pl,s){
   h+='<div class="pvbar" role="group" aria-label="Tampilkan palet"><button type="button" class="pal sm" data-pv="all" aria-pressed="'+(v==='all')+'">Semua</button>';
   for(var i=1;i<=n;i++) h+='<button type="button" class="pal sm" data-pv="'+i+'" aria-pressed="'+(v===i)+'">Palet '+i+'</button>';
   h+='</div>';
+  // urutan baris yang tampil (untuk kursor)
+  var plan=[];
   for(var j=1;j<=n;j++){
     if(v!=='all'&&v!==j) continue;
     var rows=agg[j]||{}, keys=Object.keys(rows).filter(function(k){var l=byK[k]; return !l||iqMatch([l.desc,l.code,l.batch,l.or,'#'+l.no,rows[k].bd?'beda batch '+Object.keys(rows[k].bd).join(' '):'']);}).sort(function(a,b){return (byK[a]?byK[a].no:0)-(byK[b]?byK[b].no:0);});
-    var tc=0,tp=0; keys.forEach(function(k){tc+=rows[k].c;tp+=rows[k].p;});
     var rg=rejGroups(pl,s,function(e){return (e.palet||1)===j&&e.res!=='REMAIN';});
+    plan.push({j:j,rows:rows,keys:keys,rg:rg});
+    keys.forEach(function(k){ids.push('P'+j+':L:'+k);}); rg.forEach(function(g){ids.push('P'+j+':G:'+g.key);});
+  }
+  APP._pvIds=ids;
+  var cur=(APP.pvSel&&ids.indexOf(APP.pvSel)>=0)?APP.pvSel:(ids[0]||null);
+  if(ids.length) h+='<div class="iqinfo lgkeys">'+nf(ids.length)+' baris<span class="kh"><kbd>↑</kbd><kbd>↓</kbd> pindah <kbd>Enter</kbd> detail <kbd>Esc</kbd> tutup</span></div>';
+  h+='<div class="lglist" role="listbox" aria-label="Detail palet" aria-activedescendant="'+(cur?'pv-'+ids.indexOf(cur):'')+'">';
+  plan.forEach(function(P){ var j=P.j, rows=P.rows, keys=P.keys, rg=P.rg;
+    var tc=0,tp=0; keys.forEach(function(k){tc+=rows[k].c;tp+=rows[k].p;});
     var rc=0,rpc=0; rg.forEach(function(g){rc+=g.n;rpc+=g.pcs;});
-    h+='<div class="it-grp g-prog">Palet '+j+(s.palet===j?' · aktif':'')+'<span>'+nf(tc+rc)+' ctn'+(rc?' ('+nf(rc)+' ditolak)':'')+' · '+nf(tp+rpc)+' pcs · '+keys.length+' item</span></div>';
-    if(!keys.length&&!rg.length){ h+='<div style="padding:12px 14px" class="muted">Belum ada scan di palet ini.</div>'; continue; }
-    keys.forEach(function(k){var l=byK[k]||{no:'-',desc:k,code:'',batch:'',pk:0}, bd=rows[k].bd;
-      h+='<div class="it'+(bd?' pv-bd':'')+'"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2"><span class="mno">No '+esc(l.no)+' · </span>'+esc(l.code)+'</div>'+
+    h+='<div class="it-grp g-prog lgp">Palet '+j+(s.palet===j?' · aktif':'')+'<span>'+nf(tc+rc)+' ctn'+(rc?' ('+nf(rc)+' ditolak)':'')+' · '+nf(tp+rpc)+' pcs · '+keys.length+' item</span></div>';
+    if(!keys.length&&!rg.length){ h+='<div style="padding:12px 14px" class="muted">Belum ada scan di palet ini.</div>'; return; }
+    keys.forEach(function(k){var l=byK[k]||{no:'-',desc:k,code:'',batch:'',pk:0}, bd=rows[k].bd, id='P'+j+':L:'+k, on=id===cur;
+      h+='<div class="it pvrow'+(bd?' pv-bd':'')+(on?' cur':'')+'" id="pv-'+ids.indexOf(id)+'" role="option" aria-selected="'+on+'" data-pvr="'+esc(id)+'"><span class="c-no muted">'+l.no+'</span><div style="min-width:0"><div class="d1 ell">'+esc(l.desc)+'</div><div class="d2"><span class="mno">No '+esc(l.no)+' · </span>'+esc(l.code)+'</div>'+
         (bd?'<div class="d3 bdn">Beda batch: '+esc(bdText(bd))+' · batch PL '+esc(l.batch)+'</div>':'')+'</div>'+
         '<span class="c-batch mono" style="font-size:13px">'+esc(l.batch)+'</span><span class="r c-tgt" style="font-size:13px">'+nf(rows[k].c)+' ctn</span>'+
         '<span class="r c-done" style="font-size:13px;font-weight:500">'+nf(rows[k].p)+' pcs</span><span class="c-st">'+(bd?'<span class="chip chip-w">Beda batch</span>':'')+'</span></div>';
+      if(on&&APP.pvOpen) h+=pvDetailItem(pl,s,j,k,l,byK);
     });
-    rg.forEach(function(g){
-      h+='<div class="it bad"><span class="c-no muted">'+esc(g.no)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(g.name)+'</div><div class="d2">'+esc(g.sub)+'</div></div>'+
+    rg.forEach(function(g){ var id='P'+j+':G:'+g.key, on=id===cur;
+      h+='<div class="it bad pvrow'+(on?' cur':'')+'" id="pv-'+ids.indexOf(id)+'" role="option" aria-selected="'+on+'" data-pvr="'+esc(id)+'"><span class="c-no muted">'+esc(g.no)+'</span><div style="min-width:0"><div class="d1 ell">'+esc(g.name)+'</div><div class="d2">'+esc(g.sub)+'</div></div>'+
         '<span class="c-batch mono" style="font-size:13px">'+esc(g.batch||'-')+'</span><span class="r c-tgt" style="font-size:13px">'+nf(g.n)+' ctn</span>'+
         '<span class="r c-done" style="font-size:13px;font-weight:500">'+(g.pcs?nf(g.pcs)+' pcs':'-')+'</span><span class="c-st"><span class="chip chip-r">'+esc(REJ_NAME[g.res]||g.res)+'</span></span></div>';
+      if(on&&APP.pvOpen) h+=pvDetailRej(pl,s,j,g);
     });
-  }
+  });
+  h+='</div>';
   return h;
 }
+function pvScanList(evs,pl,byK,sub){
+  var h='<div class="pvsl">';
+  evs.forEach(function(e){ var ok=e.res==='OK';
+    h+='<div class="pvs"><span class="muted">'+hhmm(e.t)+'</span><span class="mono">'+esc(e.batch||'-')+(e.bd?' <span class="chip chip-w">beda batch</span>':'')+'</span>'+
+      '<span>'+(ok?(e.kind==='ctn'?'+1 ctn · '+nf(e.pcs)+' pcs':'+'+nf(e.pcs)+' pcs ecer'):(rejPer(e)?'1 ctn · '+nf(rejPer(e))+' pcs':'-'))+'</span>'+
+      '<span class="muted">'+esc(e.by||'-')+'</span><span class="c-act">'+(sub?'':cBtn('E:'+e.id,'Hapus',(ok?'batalkan scan ':'hapus scan ditolak ')+evName(e,lineOfEvent(pl,e,byK))))+'</span></div>'; });
+  return h+'</div>';
+}
+function pvDetailItem(pl,s,j,k,l,byK){
+  var kv2=function(a,b){return '<div class="lgk"><span>'+a+'</span><b>'+b+'</b></div>';};
+  var evs=okEvents(s).filter(function(e){return (e.palet||1)===j&&e.line===k;}).sort(function(a,b){return b.t-a.t;});
+  var c=0,p=0; evs.forEach(function(e){if(e.kind==='ctn')c++; p+=e.pcs;});
+  var d=lineDone(pl), tq=0, got=0; pl.lines.forEach(function(x){ if(x.code===l.code){ tq+=x.qty; got+=d.pcs[lineKey(x)]||0; } });
+  var other={}; okEvents(s).forEach(function(e){ var lx=byK[e.line]; if(lx&&lx.code===l.code&&(e.palet||1)!==j&&e.kind==='ctn') other[e.palet||1]=(other[e.palet||1]||0)+1; });
+  var ot=Object.keys(other).sort(function(a,b){return a-b;}).map(function(x){return 'P'+x+': '+other[x]+' ctn';}).join(' · ');
+  var h='<div class="lgd" role="region" aria-label="Detail item di palet"><div class="lgd-h"><span class="chip chip-b">Palet '+j+' · '+nf(c)+' ctn · '+nf(p)+' pcs</span><button type="button" class="iconbtn sm" id="bPvClose" aria-label="Tutup detail">'+ICON.x+'</button></div>'+
+    '<div class="lgd-g">'+kv2('Item',esc('No '+l.no+' · '+l.desc))+kv2('ItemCode','<span class="mono">'+esc(l.code)+'</span>')+
+    kv2('Batch di PL','<span class="mono">'+esc(pl.lines.filter(function(x){return x.code===l.code;}).map(function(x){return x.batch;}).join(' / '))+'</span>')+
+    kv2('Total item (semua palet)',fmtQ(got,l.pk)+' dari '+fmtQ(tq,l.pk))+
+    kv2('Ada juga di palet lain',ot||'-')+kv2('Scan di palet ini',nf(evs.length)+' scan')+'</div>';
+  h+='<div class="hd-s" style="margin-top:12px">Scan di palet '+j+'</div>'+pvScanList(evs,pl,byK,s.submitted)+'</div>';
+  return h;
+}
+function pvDetailRej(pl,s,j,g){
+  var kv2=function(a,b){return '<div class="lgk"><span>'+a+'</span><b>'+b+'</b></div>';};
+  var idm={}; g.ids.forEach(function(x){idm[x]=1;});
+  var evs=rejectedOf(s).filter(function(e){return idm[e.id];}).sort(function(a,b){return b.t-a.t;});
+  var e0=evs[0]||{}, byK={}; pl.lines.forEach(function(l){byK[lineKey(l)]=l;});
+  var h='<div class="lgd" role="region" aria-label="Detail scan ditolak di palet"><div class="lgd-h"><span class="chip chip-r">Ditolak · '+esc(REJ_NAME[g.res]||g.res)+'</span><button type="button" class="iconbtn sm" id="bPvClose" aria-label="Tutup detail">'+ICON.x+'</button></div>'+
+    '<div class="lgd-g">'+kv2('Item',esc(g.name))+kv2('ItemCode','<span class="mono">'+esc(g.code||'-')+'</span>')+
+    kv2('Batch discan','<span class="mono">'+esc(g.batch||'-')+'</span>')+kv2('Jumlah di palet '+j,nf(g.n)+' ctn'+(g.pcs?' · '+nf(g.pcs)+' pcs':''))+'</div>'+
+    (e0.raw?'<div class="lgk raw"><span>Isi barcode</span><code>'+esc(e0.raw)+'</code></div>':'');
+  h+='<div class="hd-s" style="margin-top:12px">Scan ditolak di palet '+j+'</div>'+pvScanList(evs,pl,byK,s.submitted)+'</div>';
+  return h;
+}
+function pvMove(step){ var ids=APP._pvIds||[]; if(!ids.length) return; var i=ids.indexOf(APP.pvSel); if(i<0) i=0; i=Math.max(0,Math.min(ids.length-1,i+step));
+  APP.pvSel=ids[i]; render(); focusScan(); var r=document.querySelector('.pvrow.cur'); if(r&&r.scrollIntoView) r.scrollIntoView({block:'nearest'}); }
+function pvToggle(open){ var ids=APP._pvIds||[]; if(!ids.length) return; if(ids.indexOf(APP.pvSel)<0) APP.pvSel=ids[0]; APP.pvOpen=(open==null)?!APP.pvOpen:open; render(); focusScan();
+  var r=document.querySelector('.pvrow.cur'); if(r&&r.scrollIntoView) r.scrollIntoView({block:'nearest'}); }
+function curMove(step){ if(APP.itemFilter==='pal') pvMove(step); else logMove(step); }
+function curToggle(open){ if(APP.itemFilter==='pal') pvToggle(open); else logToggle(open); }
+function curOpen(){ return APP.itemFilter==='pal'?APP.pvOpen:APP.logOpen; }
 /** Baris PL milik sebuah event; kalau kuncinya tidak cocok lagi, cari lewat ItemCode. */
 function lineOfEvent(pl,e,byK){
   var l=byK?byK[e.line]:null;
@@ -1729,7 +1796,7 @@ async function openPl(id){
   syncBusy(p);   // rapikan status lama: "Sedang dicek" tanpa scan aktif -> Belum dicek
   s.startedAt=evs.length?evs[0].t:null;
   s.palet=evs.reduce(function(m,e){return Math.max(m,e.palet||1);},1); s.palCount=Math.max(s.palCount||1,s.palet);
-  APP.pl=id; APP.view='scan'; APP.itemFilter='all'; APP.palView='all'; APP.logPal='all'; APP.logSel=null; APP.logOpen=false; APP.logAll={}; APP.iq=''; APP.iqFocus=false; APP.fb=null; APP.blocked=null; APP.lastLine=null; APP.lastRaw=''; APP.plChanged=false; APP.plHash=p.hash||null;
+  APP.pl=id; APP.view='scan'; APP.itemFilter='all'; APP.palView='all'; APP.logPal='all'; APP.logSel=null; APP.logOpen=false; APP.logAll={}; APP.pvSel=null; APP.pvOpen=false; APP.iq=''; APP.iqFocus=false; APP.fb=null; APP.blocked=null; APP.lastLine=null; APP.lastRaw=''; APP.plChanged=false; APP.plHash=p.hash||null;
   var st=plStats(p); APP.mode=(st.looseLines>p.lines.length*CFG.ecerSuggestRatio)?'pcs':'ctn';
   if(APP.unsubPl) APP.unsubPl();
   APP.unsubPl=DB.watchPl(id,function(d){ if(APP.plHash&&d.hash&&d.hash!==APP.plHash&&!APP.plChanged){APP.plChanged=true; if(APP.view==='scan')render();} });
@@ -2233,11 +2300,11 @@ function bind(){
     if(sc){
       sc.addEventListener('keydown',function(e){
         // Di tab Log: panah/Enter/Esc saat kolom scan kosong menggerakkan kursor log (scanner tidak mengirim tombol ini).
-        if(APP.itemFilter==='log'&&!sc.value){
-          if(e.key==='ArrowDown'){e.preventDefault();logMove(1);return;}
-          if(e.key==='ArrowUp'){e.preventDefault();logMove(-1);return;}
-          if(e.key==='Enter'){e.preventDefault();logToggle();return;}
-          if(e.key==='Escape'&&APP.logOpen){e.preventDefault();logToggle(false);return;}
+        if((APP.itemFilter==='log'||APP.itemFilter==='pal')&&!sc.value){
+          if(e.key==='ArrowDown'){e.preventDefault();curMove(1);return;}
+          if(e.key==='ArrowUp'){e.preventDefault();curMove(-1);return;}
+          if(e.key==='Enter'){e.preventDefault();curToggle();return;}
+          if(e.key==='Escape'&&curOpen()){e.preventDefault();curToggle(false);return;}
         }
         if(e.key==='Enter'||e.key==='Tab'){ e.preventDefault(); var v=sc.value; sc.value=''; handleScan(v,'scanner'); focusScan(); }});
       sc.addEventListener('blur',function(){ setTimeout(function(){ var a=document.activeElement; if(APP.view==='scan'&&!APP.modal&&(!a||a===document.body)) focusScan(); },150); });
@@ -2249,6 +2316,9 @@ function bind(){
     each('[data-ev]',function(r){r.addEventListener('click',function(ev){ if(ev.target.closest('[data-cf]')) return;
       var id=r.getAttribute('data-ev'); if(APP.logSel===id||(!APP.logSel&&r.classList.contains('cur'))){ APP.logSel=id; logToggle(); } else { APP.logSel=id; APP.logOpen=true; render(); focusScan(); } });});
     on('bLgClose','click',function(){logToggle(false);});
+    each('[data-pvr]',function(r){r.addEventListener('click',function(ev){ if(ev.target.closest('[data-cf]')) return;
+      var id=r.getAttribute('data-pvr'); if(r.classList.contains('cur')){ APP.pvSel=id; pvToggle(); } else { APP.pvSel=id; APP.pvOpen=true; render(); focusScan(); } });});
+    on('bPvClose','click',function(){pvToggle(false);});
     if(APP.fb&&APP.fb.actions) APP.fb.actions.forEach(function(x,i){var b=document.querySelector('[data-act="'+i+'"]'); if(b) b.addEventListener('click',x.fn);});
     on('bUndo','click',undo);
     on('bEcer','click',function(){openEcer(null,'Sisa ecer / karton campuran');});
@@ -2358,10 +2428,10 @@ document.addEventListener('keydown',function(e){
     if(k==='j'||k==='ArrowDown'){e.preventDefault(); histMove(1);} else if(k==='k'||k==='ArrowUp'){e.preventDefault(); histMove(-1);}
     else if(k==='Enter'&&!(a&&a.closest&&a.closest('button'))){e.preventDefault(); APP.hist.sel=histCur(histRows()); APP.hist.open=true; render();}
     else if(k==='Escape'&&APP.hist.open){e.preventDefault(); APP.hist.open=false; render();}
-  } else if(APP.view==='scan'&&APP.itemFilter==='log'){
-    if(k==='j'||k==='ArrowDown'){e.preventDefault(); logMove(1);} else if(k==='k'||k==='ArrowUp'){e.preventDefault(); logMove(-1);}
-    else if(k==='Enter'&&!(a&&a.closest&&a.closest('button'))){e.preventDefault(); logToggle();}
-    else if(k==='Escape'&&APP.logOpen){e.preventDefault(); logToggle(false);}
+  } else if(APP.view==='scan'&&(APP.itemFilter==='log'||APP.itemFilter==='pal')){
+    if(k==='j'||k==='ArrowDown'){e.preventDefault(); curMove(1);} else if(k==='k'||k==='ArrowUp'){e.preventDefault(); curMove(-1);}
+    else if(k==='Enter'&&!(a&&a.closest&&a.closest('button'))){e.preventDefault(); curToggle();}
+    else if(k==='Escape'&&curOpen()){e.preventDefault(); curToggle(false);}
   }
 });
 window.__pchk = { APP: APP, CFG: CFG, SESS: SESS, sess: sess, plById: plById, lineDone: lineDone, plStats: plStats, lineKey: lineKey, watchList: watchList, buildResult: buildResult, navTo: navTo };
